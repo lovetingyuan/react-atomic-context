@@ -10,17 +10,18 @@ export function useAtomicContext<
   },
 >({ contexts }: T) {
   return React.useMemo(() => {
-    return new Proxy(
-      {} as {
-        [k in keyof T['contexts']]: React.ContextType<T['contexts'][k]>['atom'];
-      },
-      {
-        get(_, k) {
+    const value = {} as {
+      [k in keyof T['contexts']]: React.ContextType<T['contexts'][k]>['atom'];
+    };
+    Object.keys(contexts).forEach((key) => {
+      Object.defineProperty(value, key, {
+        get() {
           // eslint-disable-next-line react-hooks/rules-of-hooks
-          return React.useContext(contexts[k as string]).atom;
+          return React.useContext(contexts[key as string]).atom;
         },
-      },
-    );
+      });
+    });
+    return value;
   }, [contexts]);
 }
 
