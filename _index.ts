@@ -65,6 +65,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
       ctxs[key].displayName = key + 'Context';
     }
   }
+
   const AtomicContext = React.createContext<RootValue<T>>({
     bootstrap: false,
     atoms: null,
@@ -74,69 +75,71 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
   });
   AtomicContext.displayName = 'AtomicContext';
 
-  const Provider = React.memo(
-    (
-      props: React.ProviderProps<Partial<T>> & {
-        onChange?: (p: OnChangeParam<T>, v: T) => void;
-      },
-    ) => {
-      const initValueRef = React.useRef(props.value);
-      if (initValueRef.current !== props.value) {
-        throw new Error('"value" passed to Provider can not be changed, please use useMemo.');
-      }
-      const keys = React.useMemo(() => {
-        if (Object.prototype.toString.call(props.value) !== '[object Object]') {
-          throw new Error('"value" prop is required for Provider component.');
-        }
-        const keys = Object.keys(props.value) as (keyof T)[];
-        if (keys.length === 0) {
-          throw new Error('"value" passed to Provider component can not be empty object.');
-        }
-        const invalidKey = keys.find((k) => !(k in ctxs));
-        if (invalidKey) {
-          throw new Error(
-            `property "${String(
-              invalidKey,
-            )}" does not exist in the initial value passed to createAtomicContext.`,
-          );
-        }
-        return keys;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, []);
-
-      const currentValue = props.value as T;
-
-      const valueRef = React.useRef<T>(currentValue);
-      if (valueRef.current === currentValue) {
-        valueRef.current = { ...currentValue };
-      }
-
-      const atoms = React.useRef({} as AtomsType<T>);
-      let provider = props.children;
-      for (const key of keys) {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        atoms.current[key] = useGetSetState<T[keyof T]>(currentValue[key], (value, oldValue) => {
-          valueRef.current[key] = value;
-          props.onChange?.({ key, value, oldValue }, valueRef.current);
-        });
-        const atom = atoms.current[key];
-        // atom保证不变化（声明依赖时要先计算然后声明计算后的值）
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const val = React.useMemo(() => ({ atom }), [atom()]);
-        provider = React.createElement(ctxs[key].Provider, { value: val }, provider);
-      }
-      const rootValue = React.useMemo<RootValue<T>>(() => {
-        return {
-          bootstrap: true,
-          atoms,
-          getContextValue() {
-            return valueRef.current;
-          },
-        };
-      }, []);
-      return React.createElement(AtomicContext.Provider, { value: rootValue }, provider);
+  function Provider(
+    props: React.ProviderProps<T> & {
+      onChange?: (p: OnChangeParam<T>, v: T) => void;
     },
-  );
+  ) {
+    const initValueRef = React.useRef(props.value);
+    if (initValueRef.current !== props.value) {
+      throw new Error('"value" passed to Provider can not be changed, please use useMemo.');
+    }
+    const keys = React.useMemo(() => {
+      if (Object.prototype.toString.call(props.value) !== '[object Object]') {
+        throw new Error('"value" prop is required for Provider component.');
+      }
+      const keys = Object.keys(props.value) as (keyof T)[];
+      if (keys.length === 0) {
+        throw new Error('"value" passed to Provider component can not be empty object.');
+      }
+      const invalidKey = keys.find((k) => !(k in ctxs));
+      if (invalidKey) {
+        throw new Error(
+          `property "${String(
+            invalidKey,
+          )}" does not exist in the initial value passed to createAtomicContext.`,
+        );
+      }
+      return keys;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const currentValue = props.value;
+
+    const valueRef = React.useRef<T>(currentValue);
+    if (valueRef.current === currentValue) {
+      valueRef.current = { ...currentValue };
+    }
+
+    const atoms = React.useRef({} as AtomsType<T>);
+
+    let provider = props.children;
+    for (const key of keys) {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      atoms.current[key] = useGetSetState<T[keyof T]>(currentValue[key], (value, oldValue) => {
+        valueRef.current[key] = value;
+        props.onChange?.({ key, value, oldValue }, valueRef.current);
+      });
+      const atom = atoms.current[key];
+      // atom保证不变化（声明依赖时要先计算然后声明计算后的值）
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const val = React.useMemo(() => ({ atom }), [atom()]);
+      // const k = key as keyof T;
+      // const v = val as
+      provider = React.createElement(ctxs[key].Provider, { value: val }, provider);
+    }
+    const rootValue = React.useMemo<RootValue<T>>(() => {
+      return {
+        bootstrap: true,
+        atoms,
+        getContextValue() {
+          return valueRef.current;
+        },
+      };
+    }, []);
+    return React.createElement(AtomicContext.Provider, { value: rootValue }, provider);
+  }
+
   return {
     Provider,
     _contexts: ctxs,
@@ -152,13 +155,13 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
   };
 }
 
-function useGetSetState<T>(data: T, onChange?: (v: T, ov: T) => void) {
+function useGetSetState<D>(data: D, onChange?: (v: D, ov: D) => void) {
   const [val, setVal] = React.useState(data);
   const currentValRef = React.useRef(val);
   currentValRef.current = val;
-  const changeRef = React.useRef<((v: T, ov: T) => void) | undefined>(onChange);
+  const changeRef = React.useRef<((v: D, ov: D) => void) | undefined>(onChange);
   changeRef.current = onChange;
-  return React.useCallback((...args: [T] | []) => {
+  return React.useCallback((...args: [D] | []) => {
     if (args.length) {
       setVal(args[0]);
       if (changeRef.current) {
@@ -167,5 +170,5 @@ function useGetSetState<T>(data: T, onChange?: (v: T, ov: T) => void) {
     } else {
       return currentValRef.current;
     }
-  }, []) as StateFunc<T>;
+  }, []) as StateFunc<D>;
 }
