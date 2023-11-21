@@ -24,7 +24,7 @@ export function useAtomicContext<T extends Record<string, unknown>>({
     const obj = {} as {
       [k in keyof T]: StateFunc<T[k]>;
     };
-    Object.keys(_contexts).forEach((key) => {
+    Object.keys(_contexts).forEach(key => {
       Object.defineProperty(obj, key, {
         get() {
           // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -36,7 +36,7 @@ export function useAtomicContext<T extends Record<string, unknown>>({
   }, [_contexts]);
 }
 
-// 如果只是写入状态而不关心其变化则用这个hook
+// 如果只是写入状态而不关心其变化则用这个hook，仅用于必要的优化
 export function useWriteAtomicContext<T extends Record<string, unknown>>({
   _atomicContext,
 }: AtomicContextType<T>) {
@@ -60,6 +60,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
   const ctxs = {} as ContextsType<T>;
   const allKeys = Object.keys(initValue) as (keyof T)[];
   for (const key of allKeys) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ctxs[key] = React.createContext<any>(null);
     if (typeof key === 'string') {
       ctxs[key].displayName = key + 'Context';
@@ -69,6 +70,9 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
   const AtomicContext = React.createContext<RootValue<T>>({
     bootstrap: false,
     atoms: null,
+    getDefaultValue() {
+      return initValue;
+    },
     getContextValue() {
       return initValue;
     },
@@ -78,7 +82,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
   function Provider(
     props: React.ProviderProps<T> & {
       onChange?: (p: OnChangeParam<T>, v: T) => void;
-    },
+    }
   ) {
     const initValueRef = React.useRef(props.value);
     if (initValueRef.current !== props.value) {
@@ -92,12 +96,12 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
       if (keys.length === 0) {
         throw new Error('"value" passed to Provider component can not be empty object.');
       }
-      const invalidKey = keys.find((k) => !(k in ctxs));
+      const invalidKey = keys.find(k => !(k in ctxs));
       if (invalidKey) {
         throw new Error(
           `property "${String(
-            invalidKey,
-          )}" does not exist in the initial value passed to createAtomicContext.`,
+            invalidKey
+          )}" does not exist in the initial value passed to createAtomicContext.`
         );
       }
       return keys;
@@ -124,14 +128,15 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
       // atom保证不变化（声明依赖时要先计算然后声明计算后的值）
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const val = React.useMemo(() => ({ atom }), [atom()]);
-      // const k = key as keyof T;
-      // const v = val as
       provider = React.createElement(ctxs[key].Provider, { value: val }, provider);
     }
     const rootValue = React.useMemo<RootValue<T>>(() => {
       return {
         bootstrap: true,
         atoms,
+        getDefaultValue() {
+          return initValue;
+        },
         getContextValue() {
           return valueRef.current;
         },
