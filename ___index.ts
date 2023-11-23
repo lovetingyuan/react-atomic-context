@@ -37,7 +37,7 @@ export type OnChange<T extends Record<string, unknown>> = (
   p: {
     [K in keyof T]: { key: K; value: T[K]; oldValue: T[K] };
   }[keyof T],
-  v: T,
+  v: T
 ) => void;
 
 export type ContextsType<T extends Record<string, unknown>> = {
@@ -65,14 +65,14 @@ export function useAtomicContext<T extends Record<string, unknown>>({
     const getterSetters: Record<string, any> = {};
     const _getters = getters.current!;
     const _setters = setters.current!;
-    Object.keys(_getters).forEach((k) => {
+    Object.keys(_getters).forEach(k => {
       getterSetters[`get${k[0].toUpperCase()}${k.slice(1)}`] = _getters[k];
     });
-    Object.keys(_setters).forEach((k) => {
+    Object.keys(_setters).forEach(k => {
       getterSetters[`set${k[0].toUpperCase()}${k.slice(1)}`] = _setters[k];
     });
     const obj = Object.create(getterSetters) as AtomContextValueType<T>;
-    Object.keys(_contexts).forEach((key) => {
+    Object.keys(_contexts).forEach(key => {
       Object.defineProperty(obj, key, {
         get() {
           // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -106,9 +106,11 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
   Object.freeze(contexts);
 
   const AtomicContext = React.createContext<RootValue<T>>({
-    // @ts-ignore
-    getterSetters: null,
-    // @ts-ignore
+    // @ts-expect-error it is safe that context default value is null
+    getters: null,
+    // @ts-expect-error it is safe that context default value is null
+    setters: null,
+    // @ts-expect-error it is safe that context default value is null
     contextValue: null,
     getDefaultValue() {
       return initValue;
@@ -123,30 +125,26 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
     props: React.PropsWithChildren<{
       keyName: keyof T;
       onChangeRef: React.RefObject<OnChange<T> | undefined>;
-    }>,
+    }>
   ) {
     const key = props.keyName;
     const { contextValue, setters } = React.useContext(AtomicContext);
     const [val, setVal] = React.useState(contextValue.current![key]);
     const valRef = React.useRef(val);
     valRef.current = val;
-    if (!(key in setters.current!)) {
-      setters.current![key] = (value) => {
-        setVal(value);
-        contextValue.current![key] = value;
-        props.onChangeRef.current?.(
-          { key, value, oldValue: valRef.current },
-          contextValue.current!,
-        );
-      };
-    }
+    setters.current![key] = React.useCallback(value => {
+      setVal(value);
+      contextValue.current![key] = value;
+      props.onChangeRef.current?.({ key, value, oldValue: valRef.current }, contextValue.current!);
+    }, []);
+
     return React.createElement(contexts[key].Provider, { value: val }, props.children);
   });
 
   function Provider(
     props: React.ProviderProps<T> & {
       onChange?: OnChange<T>;
-    },
+    }
   ) {
     const initValueRef = React.useRef(props.value);
     if (initValueRef.current !== props.value) {
@@ -159,12 +157,12 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
     if (keys.length === 0) {
       throw new Error('"value" passed to Provider component can not be empty object.');
     }
-    const invalidKey = keys.find((k) => !(k in contexts));
+    const invalidKey = keys.find(k => !(k in contexts));
     if (invalidKey) {
       throw new Error(
         `property "${String(
-          invalidKey,
-        )}" does not exist in the initial value passed to createAtomicContext.`,
+          invalidKey
+        )}" does not exist in the initial value passed to createAtomicContext.`
       );
     }
 
@@ -193,7 +191,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
           keyName: key,
           onChangeRef,
         },
-        provider,
+        provider
       );
     }
 
