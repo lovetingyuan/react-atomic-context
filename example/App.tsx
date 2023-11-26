@@ -1,178 +1,64 @@
 import React from 'react';
 import { createAtomicContext, useAtomicContext } from '../src/index.ts';
 
-function generateLightColor() {
-  const r = Math.floor(Math.random() * 156 + 100); // 生成100到255之间的随机整数作为红色通道值
-  const g = Math.floor(Math.random() * 156 + 100); // 生成100到255之间的随机整数作为绿色通道值
-  const b = Math.floor(Math.random() * 156 + 100); // 生成100到255之间的随机整数作为蓝色通道值
+const AppContext = createAtomicContext({
+  foo: 'foo',
+  bar: 'bar',
+});
 
-  // 使用RGB通道值构建颜色字符串
-  const color = 'rgba(' + r + ', ' + g + ', ' + b + ', 0.5)';
-
-  return color;
-}
-
-function Siv(
-  props: React.PropsWithChildren<{
-    title: string;
-  }>
-) {
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const colorRef = React.useRef('');
-  if (!colorRef.current) {
-    colorRef.current = generateLightColor();
-  }
-  const timerRef = React.useRef(0);
-  const renderCount = React.useRef(0).current++;
-  const [, update] = React.useState();
-  // clearTimeout(timerRef.current)
-  React.useEffect(() => {
-    if (!renderCount) {
-      return;
-    }
-    if (containerRef.current) {
-      containerRef.current.style.backgroundColor = colorRef.current;
-    }
-    timerRef.current = setTimeout(() => {
-      if (containerRef.current) {
-        containerRef.current.style.backgroundColor = 'white';
-      }
-    }, 500);
-  });
+const Foo = React.memo(function Foo() {
+  const { foo, setFoo, setBar } = useAtomicContext(AppContext);
+  console.log('foo rendered');
   return (
-    <div
-      ref={containerRef}
-      style={{
-        position: 'relative',
-        padding: 10,
-        margin: 10,
-        borderWidth: 5,
-        borderStyle: 'solid',
-        borderColor: 'gray',
-        backgroundColor: 'white',
-        resize: 'both',
-        overflow: 'auto',
-      }}
-    >
+    <div>
+      <p> this is foo: {foo} </p>
       <button
-        onClick={update}
-        style={{
-          position: 'absolute',
-          right: 0,
-          top: 0,
+        onClick={() => {
+          setFoo(`foo${Math.random().toString().slice(0, 5)}`);
         }}
       >
-        {props.title}: {renderCount}
+        change foo
       </button>
-      {props.children}
+      <button
+        onClick={() => {
+          setBar(`bar${Math.random().toString().slice(0, 5)}`);
+        }}
+      >
+        change bar
+      </button>
+      <hr />
+      <Bar />
     </div>
   );
-}
+});
 
-
-const A = React.memo(() => {
-  const { one, setOne, two, setTwo, } = useAtomicContext(RootContext);
+const Bar = React.memo(function Bar() {
+  const { bar, setBar } = useAtomicContext(AppContext);
+  console.log('bar rendered');
   return (
-    <Siv title="AAA">
+    <div>
+      <p> this is bar: {bar} </p>
       <button
         onClick={() => {
-          setOne(`one: ${Date.now().toString().slice(-3)}`)
+          setBar(`bar${Math.random().toString().slice(0, 5)}`);
         }}
       >
-        {one}
+        change bar
       </button>
-      <button
-        onClick={() => {
-          setTwo(`two: ${Date.now().toString().slice(-3)}`)
-        }}
-      >
-        {two}
-      </button>
-      <B></B>
-    </Siv>
+    </div>
   );
 });
 
-const B = React.memo(() => {
-  const a = useAtomicContext(RootContext);
-  const { three, setThree, setFive, five } = a
-  return (
-    <Siv title={'BBB'}>
-      <button
-        onClick={() => {
-          setThree(`three: ${Date.now().toString().slice(-3)}`)
-        }}
-      >
-        {three}
-      </button>
-      <button
-        onClick={() => {
-          setFive(`five: ${Date.now().toString().slice(-3)}`)
-        }}
-      >
-        {five}
-      </button>
-
-      <C></C>
-    </Siv>
-  );
-});
-
-const C = React.memo(() => {
-  const { four, two, setTwo, setFour, setFive, getFive } = useAtomicContext(RootContext);
-  const [, seta] = React.useState(0);
-  return (
-    <Siv title="CCC">
-      <button onClick={seta}>sss</button>
-      <button
-        onClick={() => {
-          setTwo(`two: ${Date.now().toString().slice(-3)}`)
-        }}
-      >
-        {two}
-      </button>
-      <button
-        onClick={() => {
-          setFour(`four: ${Date.now().toString().slice(-3)}`)
-        }}
-      >
-        {four}
-      </button>
-      <button
-        onClick={() => {
-          setFive(`five: ${Date.now().toString().slice(-3)}`)
-        }}
-      >
-        {getFive()}
-      </button>
-    </Siv>
-  );
-});
-
-const RootContext = createAtomicContext({
-  one: 'one',
-  two: 'two',
-  three: 'three',
-  four: 'four',
-  five: 'five',
-});
-
-export default function Root() {
-  const init = React.useMemo(() => {
+export default function App() {
+  const initState = React.useMemo(() => {
     return {
-      one: 'one',
-      two: 'two',
-      three: 'three',
-      four: 'four',
-      five: 'five',
-      // s: 2,
-    };
-  }, [])
+      foo: 'foo',
+      bar: 'bar',
+    }
+  }, []);
   return (
-    <RootContext.Provider
-      value={init}
-    >
-      <A></A>
-    </RootContext.Provider>
+    <AppContext.Provider value={initState}>
+      <Foo />
+    </AppContext.Provider>
   );
 }

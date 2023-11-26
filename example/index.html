@@ -17,14 +17,24 @@
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <h3>Loading...</h3>
+  </div>
   <script type="module">
     window.addEventListener('load', () => {
       navigator.serviceWorker
         .register('./service-worker.js')
         .then(registration => {
+          if (navigator.serviceWorker.controller?.state === 'activated') {
+            // 当前存在正在控制的 Service Worker
+            import('./main.tsx');
+          } else {
+            // 当前没有正在控制的 Service Worker
+            console.log('当前没有 Service Worker 在控制页面');
+            location.reload()
+          }
+          // registration.addEventListener('')
           // console.log('Service Worker registered:', registration);
-          import('./main.tsx');
         })
         .catch(error => {
           console.error('Service Worker registration failed:', error);

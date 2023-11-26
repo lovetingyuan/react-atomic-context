@@ -4,7 +4,8 @@
   "description": "make react context atomic",
   "main": "index.js",
   "directories": {
-    "example": "example"
+    "example": "example",
+    "lib": "src"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,7 +13,7 @@
     "dev": "live-server ./"
   },
   "keywords": [],
-  "author": "",
+  "author": "tingyuan",
   "license": "ISC",
   "peerDependencies": {
     "react": "^18.0.0",
@@ -31,9 +32,8 @@
     "splitting": false,
     "sourcemap": true,
     "clean": true,
-    "target": "es5",
+    "target": "es6",
     "format": [
-      "cjs",
       "esm"
     ],
     "dts": true,
