@@ -1,8 +1,28 @@
 {
   "name": "react-atomic-context",
   "version": "1.0.0",
-  "description": "make react context atomic",
-  "main": "index.js",
+  "description": "optimized React Context",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "node": "./dist/index.mjs",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./package.json": "./package.json",
+    "./dist/*": "./dist/*"
+  },
   "directories": {
     "example": "example",
     "lib": "src"
@@ -12,18 +32,32 @@
     "build": "tsup",
     "dev": "live-server ./"
   },
-  "keywords": [],
+  "keywords": [
+    "react",
+    "context",
+    "atomic",
+    "atom",
+    "state"
+  ],
   "author": "tingyuan",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lovetingyuan/react-atomic-context/issues"
+  },
+  "homepage": "https://github.com/lovetingyuan/react-atomic-context#readme",
   "peerDependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.38",
     "@types/react-dom": "^18.2.17",
     "tsup": "^8.0.1",
     "typescript": "^5.3.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lovetingyuan/react-atomic-context.git"
   },
   "tsup": {
     "entry": [
@@ -34,8 +68,12 @@
     "clean": true,
     "target": "es6",
     "format": [
-      "esm"
+      "esm",
+      "cjs"
     ],
-    "dts": true
+    "dts": true,
+    "externals": [
+      "react"
+    ]
   }
 }
