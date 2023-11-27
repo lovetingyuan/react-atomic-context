@@ -122,14 +122,6 @@ export function createAtomicContext<T extends Record<string, unknown>>(
         )
       }
     }
-    const invalidKey = keys.find(k => !(k in contexts))
-    if (invalidKey) {
-      throw new Error(
-        `property "${String(
-          invalidKey
-        )}" does not exist in the initial value passed to createAtomicContext.`
-      )
-    }
 
     const valueRef = React.useRef<T>(props.value)
     if (valueRef.current === props.value) {
