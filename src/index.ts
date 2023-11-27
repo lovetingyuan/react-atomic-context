@@ -12,6 +12,7 @@ import type {
   AtomicContextGettersType,
   AtomicContextSettersType,
   OnChangeType,
+  ProviderType,
 } from './types.ts'
 
 export function useAtomicContext<T extends Record<string, unknown>>({
@@ -36,7 +37,7 @@ export function useAtomicContext<T extends Record<string, unknown>>({
     Object.keys(_setters).forEach(k => {
       getterSetters[`set${k[0].toUpperCase()}${k.slice(1)}`] = _setters[k]
     })
-    const obj = Object.create(getterSetters) as AtomContextValueType<T>
+    const obj = Object.create(Object.freeze(getterSetters)) as AtomContextValueType<T>
     Object.keys(_contexts).forEach(key => {
       Object.defineProperty(obj, key, {
         get() {
@@ -49,16 +50,10 @@ export function useAtomicContext<T extends Record<string, unknown>>({
   }, [])
 }
 
-// // 用来获取当前context的值，仅用于开发调试
-// export function useInspectAtomicContext<T extends Record<string, unknown>>({
-//   _atomicContext,
-// }: AtomicContextType<T>) {
-//   const { getContextValue } = React.useContext(_atomicContext)
-//   return getContextValue
-// }
-
 // 创建一个context，必须传入初始值
-export function createAtomicContext<T extends Record<string, unknown>>(initValue: T) {
+export function createAtomicContext<T extends Record<string, unknown>>(
+  initValue: T
+): AtomicContextType<T> {
   Object.seal(initValue)
   const contexts = Object.create(null) as ContextsType<T>
   const allKeys = Object.keys(initValue) as (keyof T)[]
@@ -75,12 +70,6 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
     getters: null,
     setters: null,
     contextValue: null,
-    // getDefaultValue() {
-    //   return initValue
-    // },
-    // getContextValue() {
-    //   return initValue
-    // },
   })
   AtomicContext.displayName = 'AtomicContext'
 
@@ -107,11 +96,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
     return React.createElement(contexts[key].Provider, { value: val }, props.children)
   })
 
-  function Provider(
-    props: React.ProviderProps<T> & {
-      onChange?: OnChangeType<T>
-    }
-  ) {
+  const Provider: ProviderType<T> = props => {
     const initValueRef = React.useRef(props.value)
     if (initValueRef.current !== props.value) {
       throw new Error('"value" passed to Provider can not be changed, please use useMemo.')
@@ -180,12 +165,6 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
         getters: gettersRef,
         setters: settersRef,
         contextValue: valueRef,
-        // getDefaultValue() {
-        //   return initValue
-        // },
-        // getContextValue() {
-        //   return valueRef.current
-        // },
       } satisfies RootValue<T>
     }, [])
     return React.createElement(AtomicContext.Provider, { value: rootValue }, provider)
@@ -203,7 +182,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(initValue
     },
     _currentValue: initValue,
     typeof: '$AtomicContext' as const,
-  }
+  } satisfies AtomicContextType<T>
 }
 
 export type { AtomContextValueType, AtomicContextGettersType, AtomicContextSettersType }

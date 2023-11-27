@@ -1,7 +1,7 @@
 {
   "name": "react-atomic-context",
   "version": "1.0.0",
-  "description": "optimized React Context",
+  "description": "Optimized React context",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -26,6 +26,10 @@
   "directories": {
     "example": "example",
     "lib": "src"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -71,9 +75,6 @@
       "esm",
       "cjs"
     ],
-    "dts": true,
-    "externals": [
-      "react"
-    ]
+    "dts": true
   }
 }

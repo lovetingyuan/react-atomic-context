@@ -41,17 +41,23 @@ export type ContextsType<T extends Record<string, unknown>> = {
   [k in keyof T]: React.Context<T[k]>
 }
 
+export type RootValue<T extends Record<string, unknown>> = {
+  getters: React.MutableRefObject<GettersType<T>> | null
+  setters: React.MutableRefObject<SettersType<T>> | null
+  contextValue: React.MutableRefObject<T> | null
+}
+
+export type ProviderType<T extends Record<string, unknown>> = (
+  props: React.ProviderProps<T> & {
+    onChange?: OnChangeType<T>
+  }
+) => React.FunctionComponentElement<React.ProviderProps<RootValue<T>>>
+
 export interface AtomicContextType<T extends Record<string, unknown>> {
   _contexts: ContextsType<T>
   displayName?: string
   _atomicContext: React.Context<RootValue<T>>
   _currentValue: T
-  // Provider: React.Component;
+  Provider: ProviderType<T>
   typeof: '$AtomicContext'
-}
-
-export type RootValue<T extends Record<string, unknown>> = {
-  getters: React.MutableRefObject<GettersType<T>> | null
-  setters: React.MutableRefObject<SettersType<T>> | null
-  contextValue: React.MutableRefObject<T> | null
 }
