@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>react-atomic-context example</title>
-  <script type="importmap">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>react-atomic-context example</title>
+    <script type="importmap">
       {
         "imports": {
           "react": "https://esm.sh/react@18.2.0",
@@ -13,34 +12,41 @@
           "react-dom/": "https://esm.sh/react-dom@18.2.0/"
         }
       }
-  </script>
-</head>
+    </script>
+    <!-- <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@16.8.0",
+          "react-dom": "https://esm.sh/react-dom@16.8.0"
+        }
+      }
+    </script> -->
+  </head>
 
-<body>
-  <div id="root">
-    <h3>Loading...</h3>
-  </div>
-  <script type="module">
-    window.addEventListener('load', () => {
-      navigator.serviceWorker
-        .register('./service-worker.js')
-        .then(registration => {
-          if (navigator.serviceWorker.controller?.state === 'activated') {
-            // 当前存在正在控制的 Service Worker
-            import('./main.tsx');
-          } else {
-            // 当前没有正在控制的 Service Worker
-            console.log('当前没有 Service Worker 在控制页面');
+  <body>
+    <div id="root">
+      <h3>Loading...</h3>
+    </div>
+    <script type="module">
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('./service-worker.js')
+          .then(registration => {
+            if (navigator.serviceWorker.controller?.state === 'activated') {
+              import('./main.tsx')
+            } else {
+              location.reload()
+            }
+          })
+          .catch(error => {
+            console.error('Service Worker registration failed:', error)
+          })
+        navigator.serviceWorker.addEventListener('message', event => {
+          if (event.data === 'refresh') {
             location.reload()
           }
-          // registration.addEventListener('')
-          // console.log('Service Worker registered:', registration);
         })
-        .catch(error => {
-          console.error('Service Worker registration failed:', error);
-        });
-    });
-  </script>
-</body>
-
+      })
+    </script>
+  </body>
 </html>
