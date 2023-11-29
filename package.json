@@ -1,19 +1,21 @@
 {
   "name": "react-atomic-context",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Optimized React context",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.umd.js",
+  "jsdelivr": "./dist/index.umd.js",
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.mts",
-        "node": "./dist/index.mjs",
-        "default": "./dist/index.mjs"
+        "types": "./dist/index.d.ts",
+        "node": "./dist/index.modern.mjs",
+        "default": "./dist/index.modern.mjs"
       },
       "require": {
         "types": "./dist/index.d.ts",
@@ -27,21 +29,24 @@
     "example": "example",
     "lib": "src"
   },
+  "sideEffects": false,
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsup",
-    "dev": "live-server ./"
+    "build": "microbundle src/index.ts --globals react=React --name ReactAtomicContext",
+    "dev": "live-server ./",
+    "prebuild": "node -e \"require('fs').rmSync('./dist',{force:true,recursive:true})\""
   },
   "keywords": [
     "react",
     "context",
     "atomic",
     "atom",
-    "state"
+    "state",
+    "store"
   ],
   "author": "tingyuan",
   "license": "MIT",
@@ -49,32 +54,18 @@
     "url": "https://github.com/lovetingyuan/react-atomic-context/issues"
   },
   "homepage": "https://github.com/lovetingyuan/react-atomic-context#readme",
+  "devDependencies": {
+    "@types/react": "^18.2.38",
+    "@types/react-dom": "^18.2.17",
+    "microbundle": "^0.15.1",
+    "typescript": "^5.3.2"
+  },
   "peerDependencies": {
     "react": "^16.8.0",
     "react-dom": "^16.8.0"
   },
-  "devDependencies": {
-    "@types/react": "^18.2.38",
-    "@types/react-dom": "^18.2.17",
-    "tsup": "^8.0.1",
-    "typescript": "^5.3.2"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lovetingyuan/react-atomic-context.git"
-  },
-  "tsup": {
-    "entry": [
-      "./src/index.ts"
-    ],
-    "splitting": false,
-    "sourcemap": true,
-    "clean": true,
-    "target": "es6",
-    "format": [
-      "esm",
-      "cjs"
-    ],
-    "dts": true
   }
 }

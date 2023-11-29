@@ -1,4 +1,4 @@
-import { createAtomicContext } from '../src/index.ts'
+import { createAtomicContext } from 'react-atomic-context'
 
 const RootContext = createAtomicContext({
   one: 'one',

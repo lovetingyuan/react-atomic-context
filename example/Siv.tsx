@@ -21,7 +21,7 @@ export default function Siv(
   if (!colorRef.current) {
     colorRef.current = generateLightColor()
   }
-  const timerRef = React.useRef(0)
+  const timerRef = React.useRef<any>(0)
   const renderCount = React.useRef(0).current++
   // clearTimeout(timerRef.current)
   React.useEffect(() => {

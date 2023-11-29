@@ -1,5 +1,5 @@
 import React from 'react'
-import { createAtomicContext, useAtomicContext } from '../src/index.ts'
+import { createAtomicContext, useAtomicContext } from 'react-atomic-context'
 import Siv from './Siv.tsx'
 import { RootContext } from './context.ts'
 
