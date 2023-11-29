@@ -4,24 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>react-atomic-context example</title>
-    <script type="importmap">
-      {
-        "imports": {
-          "react": "https://esm.sh/react@18.2.0",
-          "react-dom": "https://esm.sh/react-dom@18.2.0",
-          "react-dom/": "https://esm.sh/react-dom@18.2.0/",
-          "react-atomic-context": "../dist/index.mjs"
-        }
-      }
+    <script>
+      window.reactVersion = 18
     </script>
-    <!-- <script type="importmap">
-      {
-        "imports": {
-          "react": "https://esm.sh/react@16.8.0",
-          "react-dom": "https://esm.sh/react-dom@16.8.0"
+    <script>
+      let imports = {
+        'react-atomic-context': '../dist/index.mjs',
+      }
+      if (reactVersion === 16) {
+        imports = {
+          ...imports,
+          react: 'https://esm.sh/react@16.8.0',
+          'react-dom': 'https://esm.sh/react-dom@16.8.0',
+        }
+      } else {
+        imports = {
+          ...imports,
+          react: 'https://esm.sh/react@18.2.0',
+          'react-dom': 'https://esm.sh/react-dom@18.2.0',
+          'react-dom/': 'https://esm.sh/react-dom@18.2.0/',
         }
       }
-    </script> -->
+      const script = document.createElement('script')
+      script.type = 'importmap'
+      script.innerHTML = JSON.stringify({ imports })
+      document.head.appendChild(script)
+    </script>
   </head>
 
   <body>
@@ -34,7 +42,7 @@
           .register('./service-worker.js')
           .then(registration => {
             if (navigator.serviceWorker.controller?.state === 'activated') {
-              import('./main.tsx')
+              import(reactVersion === 16 ? './main16.tsx' : './main.tsx')
             } else {
               location.reload()
             }
