@@ -29,8 +29,8 @@ export function useAtomicContext<T extends Record<string, unknown>>({
         return Object.freeze({ ...contextValue.current })
       },
     }
-    const _getters = getters.current!
-    const _setters = setters.current!
+    const _getters = getters.current
+    const _setters = setters.current
     Object.keys(_getters).forEach(k => {
       getterSetters[`get${k[0].toUpperCase()}${k.slice(1)}`] = _getters[k]
     })
@@ -84,13 +84,13 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     if (!contextValue || !setters) {
       throw new Error('components using atomic-context must be wrapped by the Provider.')
     }
-    const [val, setVal] = React.useState(contextValue.current![key])
+    const [val, setVal] = React.useState(contextValue.current[key])
     const valRef = React.useRef(val)
     valRef.current = val
-    setters.current![key] = React.useCallback(value => {
+    setters.current[key] = React.useCallback(value => {
       setVal(value)
-      contextValue.current![key] = value
-      props.onChangeRef.current?.({ key, value, oldValue: valRef.current }, contextValue.current!)
+      contextValue.current[key] = value
+      props.onChangeRef.current?.({ key, value, oldValue: valRef.current }, contextValue.current)
     }, [])
 
     return React.createElement(contexts[key].Provider, { value: val }, props.children)
