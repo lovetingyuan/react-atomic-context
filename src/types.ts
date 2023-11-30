@@ -12,14 +12,23 @@ export type SettersType<T extends Record<string, unknown>> = {
   [k in keyof T]: (v: T[k]) => void
 }
 
-export type AtomicContextGettersType<T extends Record<string, unknown>> = {
-  [k in keyof T as GetSetKey<k, 'get'>]: () => T[k]
+export type AtomicContextGettersType<
+  T extends Record<string, unknown>,
+  K extends keyof T = keyof T
+> = {
+  [k in K as GetSetKey<k, 'get'>]: () => T[k]
 }
 
-export type AtomicContextSettersType<T extends Record<string, unknown>> = {
-  [k in keyof T as GetSetKey<k, 'set'>]: (newValue: T[k]) => void
+export type AtomicContextSettersType<
+  T extends Record<string, unknown>,
+  K extends keyof T = keyof T
+> = {
+  [k in K as GetSetKey<k, 'set'>]: (newValue: T[k]) => void
 }
 
+/**
+ * type of atomic context value(return type of `useAtomicContext`)
+ */
 export type AtomContextValueType<T extends Record<string, unknown>> = Omit<
   T &
     AtomicContextSettersType<T> &
@@ -47,12 +56,18 @@ export type RootValue<T extends Record<string, unknown>> = {
   contextValue: React.MutableRefObject<T> | null
 }
 
+/**
+ * atomic context Provider component type.
+ */
 export type ProviderType<T extends Record<string, unknown>> = (
   props: React.ProviderProps<T> & {
     onChange?: OnChangeType<T>
   }
 ) => React.FunctionComponentElement<React.ProviderProps<RootValue<T>>>
 
+/**
+ * type of atomic context(return type of `createAtomicContext`)
+ */
 export interface AtomicContextType<T extends Record<string, unknown>> {
   _contexts: ContextsType<T>
   displayName?: string

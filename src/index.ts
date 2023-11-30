@@ -15,6 +15,12 @@ import type {
   ProviderType,
 } from './types.ts'
 
+/**
+ * react hook to read value from an atomic context.
+ * see: https://github.com/lovetingyuan/react-atomic-context#readme
+ * @param param atomic context created by `createAtomicContext`
+ * @returns context value with getters and setters of each property.
+ */
 export function useAtomicContext<T extends Record<string, unknown>>({
   _contexts,
   _atomicContext,
@@ -50,7 +56,12 @@ export function useAtomicContext<T extends Record<string, unknown>>({
   }, [])
 }
 
-// 创建一个context，必须传入初始值
+/**
+ * create a new atomic context.
+ * see: https://github.com/lovetingyuan/react-atomic-context#readme
+ * @param initValue initial value for creating a new atomic context, required.
+ * @returns a new atomic context
+ */
 export function createAtomicContext<T extends Record<string, unknown>>(
   initValue: T
 ): AtomicContextType<T> {
