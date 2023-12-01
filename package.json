@@ -38,12 +38,12 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
+    "test": "tsx tests/index.ts",
     "build": "microbundle --entry src/index.ts --globals react=React --name ReactAtomicContext",
     "dev": "live-server ./",
     "prebuild": "node -e \"require('fs').rmSync('./dist',{force:true,recursive:true})\"",
     "postbuild": "node -e \"require('fs').copyFileSync('dist/index.d.ts','dist/index.d.mts')\"",
-    "prepublishOnly": "npm run build",
-    "test": "npx tsx tests/index.ts"
+    "prepublishOnly": "npm test && npm run build"
   },
   "keywords": [
     "react",
@@ -66,6 +66,7 @@
     "global-jsdom": "9.1.0",
     "jsdom": "23.0.1",
     "microbundle": "^0.15.1",
+    "tsx": "^4.6.1",
     "typescript": "^5.3.2"
   },
   "peerDependencies": {
