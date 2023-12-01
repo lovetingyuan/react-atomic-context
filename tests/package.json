@@ -2,5 +2,8 @@
   "name": "tests",
   "version": "0.0.1",
   "description": "tests for this library",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "react-atomic-context": "file:../"
+  }
 }

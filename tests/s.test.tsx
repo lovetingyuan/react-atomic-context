@@ -1,22 +1,48 @@
 import React from 'react'
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 import { describe, it, afterEach } from 'node:test'
 import { strict as assert } from 'node:assert'
 
-function Foo(props: { url: string }) {
-  return <p data-testid="foo">this is foo: {props.url}</p>
+import { createAtomicContext, useAtomicContext } from 'react-atomic-context'
+
+const context = createAtomicContext({
+  aaa: 'aaa'
+})
+
+const A = React.memo(function A() {
+  const { aaa, setAaa } = useAtomicContext(context);
+  const updateCount = React.useRef(1).current++
+  return <div>
+    <p data-testid="dksflj" onClick={() => {
+      setAaa(aaa.toUpperCase() + updateCount)
+    }}>{aaa}</p>
+  </div>
+})
+
+function App() {
+  const initValue = React.useMemo(() => {
+    return {
+      aaa: 'aaa'
+    }
+  }, [])
+  return (
+    <context.Provider value={initValue}>
+      <A />
+    </context.Provider>
+  )
 }
 
 describe('test-foo', t => {
-  // This test passes because the Promise returned by the async
-  // function is settled and not rejected.
   afterEach(() => {
     cleanup()
   })
   it('foo-test', () => {
-    const url = '/greeting'
-    render(<Foo url={url} />)
-    const p = screen.getByTestId('foo')
-    assert.ok(p.innerHTML.includes(url))
+    render(<App />)
+    const p = screen.getByTestId('dksflj')
+    assert.ok(p.textContent?.includes('aaa'))
+    fireEvent.click(p)
+    assert.equal(p.textContent, 'AAA1')
+    fireEvent.click(p)
+    assert.equal(p.textContent, 'AAA12')
   })
 })
