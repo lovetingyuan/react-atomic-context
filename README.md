@@ -87,7 +87,7 @@ API:
 - createAtomicContext
 
   - Used to create a context, similar to `React.createContext`, but it requires an object as the initial value.
-  - The created context provides a Provider component, which wraps the components to be rendered. It must be provided with a prop named `value`, whose value is typically similar to the initial value and contains properties consistent with the initial value.
+  - The created context provides a Provider component, which wraps the components to be rendered. It must be provided with a prop named `value`, whose value is typically similar to the initial value and contains properties consistent with the initial value. Changing value of `value` prop won't take effect.
   - The Provider component also provides an additional `onChange` prop that accepts a function, which is called whenever any property changes.
   - There is no "Consumer" component available in `react-atomic-context`. We only support accessing the context through calling `useAtomicContext`.
 

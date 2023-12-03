@@ -1,6 +1,6 @@
 {
   "name": "react-atomic-context",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.6",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "description": "Optimized React context",
@@ -38,7 +38,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "test": "tsx tests/index.ts",
+    "test": "tsc --noEmit -p tests/tsconfig.json && tsx tests/index.ts",
     "build": "microbundle --entry src/index.ts --globals react=React --name ReactAtomicContext",
     "dev": "live-server ./",
     "prebuild": "node -e \"require('fs').rmSync('./dist',{force:true,recursive:true})\"",

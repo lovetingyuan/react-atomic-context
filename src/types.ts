@@ -12,6 +12,9 @@ export type SettersType<T extends Record<string, unknown>> = {
   [k in keyof T]: (v: T[k]) => void
 }
 
+/**
+ * type of getters object according the context value.
+ */
 export type AtomicContextGettersType<
   T extends Record<string, unknown>,
   K extends keyof T = keyof T
@@ -19,6 +22,9 @@ export type AtomicContextGettersType<
   [k in K as GetSetKey<k, 'get'>]: () => T[k]
 }
 
+/**
+ * type of setters object according the context value.
+ */
 export type AtomicContextSettersType<
   T extends Record<string, unknown>,
   K extends keyof T = keyof T
@@ -39,7 +45,10 @@ export type AtomContextValueType<T extends Record<string, unknown>> = Omit<
   ''
 >
 
-export type OnChangeType<T extends Record<string, unknown>> = (
+/**
+ * type of onChange callback which is passed to Provider.
+ */
+export type ProviderOnChangeType<T extends Record<string, unknown>> = (
   changeInfo: {
     [K in keyof T]: { key: K; value: T[K]; oldValue: T[K] }
   }[keyof T],
@@ -59,9 +68,9 @@ export type RootValue<T extends Record<string, unknown>> = {
 /**
  * atomic context Provider component type.
  */
-export type ProviderType<T extends Record<string, unknown>> = (
+export type AtomicProviderType<T extends Record<string, unknown>> = (
   props: React.ProviderProps<T> & {
-    onChange?: OnChangeType<T>
+    onChange?: ProviderOnChangeType<T>
   }
 ) => React.FunctionComponentElement<React.ProviderProps<RootValue<T>>>
 
@@ -73,6 +82,14 @@ export interface AtomicContextType<T extends Record<string, unknown>> {
   displayName?: string
   _atomicContext: React.Context<RootValue<T>>
   _currentValue: T
-  Provider: ProviderType<T>
+  Provider: AtomicProviderType<T>
   typeof: '$AtomicContext'
 }
+
+/**
+ * get default value type by inferring atomic context type.
+ * In general, it is sufficient to directly export the type of the initial value
+ * and there is no need to use this type.
+ */
+export type GetAtomicContextValueType<C extends AtomicContextType<any>> =
+  C extends AtomicContextType<infer U> ? U : never

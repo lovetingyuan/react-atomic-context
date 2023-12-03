@@ -54,6 +54,7 @@ const B = React.memo(() => {
 })
 
 const C = React.memo(() => {
+  const aa = useAtomicContext(RootContext)
   const {
     four,
     two,
@@ -62,7 +63,7 @@ const C = React.memo(() => {
     setFive,
     getFive,
     get: getContextValue,
-  } = useAtomicContext(RootContext)
+  } = aa;
   const [, seta] = React.useState(0)
   return (
     <Siv title="CCC">
@@ -107,6 +108,7 @@ export default function Root() {
       three: 'three',
       four: 'four',
       five: 'five',
+      // '': 'dfs'
     }
   }, [])
   return (
