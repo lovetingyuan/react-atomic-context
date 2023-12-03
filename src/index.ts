@@ -1,8 +1,7 @@
 /**
- * Optimized context
- * allows individual reading and writing of each property of the value
+ * Optimized react context. Created by tingyuan.
+ * Allows individual reading and writing of each property of the value
  * and meantime won't trigger a full re-rendering.
- * Created by tingyuan.
  */
 import React from 'react'
 import type {
@@ -16,7 +15,6 @@ import type {
   AtomicContextSettersType,
   ProviderOnChangeType,
   AtomicProviderType,
-  // GetAtomicContextValueType,
 } from './types.ts'
 
 const notUnderProviderError = 'components using useAtomicContext must be wrapped by the Provider.'
@@ -82,6 +80,9 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     }
     if (Object.prototype.toString.call(props.value) !== '[object Object]') {
       throw new Error('"value" prop of Provider is required and must be object.')
+    }
+    if (props.onChange && typeof props.onChange !== 'function') {
+      throw new Error('"onChange" prop of Provider must be a function.')
     }
     const keys = Object.keys(initValueRef.current) as (keyof T)[]
     const valueRef = React.useRef<T>(initValueRef.current)
@@ -194,5 +195,4 @@ export type {
   AtomicContextGettersType,
   AtomicContextSettersType,
   ProviderOnChangeType,
-  // GetAtomicContextValueType,
 }

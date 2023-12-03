@@ -6,7 +6,7 @@ For this issue, this library provides a simple solution.
 
 You can use this library to individually read and write each property in React context without worrying about triggering a full re-render of all related components under the context.
 
-Example:
+## Example:
 
 ```tsx
 import React from 'react'
@@ -80,9 +80,11 @@ export default function App() {
 }
 ```
 
+[![Open in CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/react-atomic-context-4mkp5t?file=%2Fsrc%2FApp.js%3A71%2C1)
+
 Overall, the usage of `react-atomic-context` is similar to regular React context. First, you create a context. Then, you use its Provider to wrap the components you want to render. Within the component, you can read and modify the context value using the provided use hook.
 
-API:
+## API:
 
 - createAtomicContext
 
@@ -98,3 +100,42 @@ API:
   - The `setFoo` method is used to update the value of the `foo` property, while `getFoo` is used solely to obtain the latest value of the `foo` property.
   - Why provide `getFoo` when we can directly access the value of `foo`? In most cases, there is no need to use `getFoo`. Accessing `foo` directly through destructuring informs React that the current component's rendering depends on the value of `foo`. Thus, when `foo` changes, the current component will be re-rendered. However, there are situations where we only want to retrieve the value of `foo` without caring about its changes. In such cases, you should use the `getFoo` method.
   - Specifically, this hook will return a method named `get` that returns the current value of the context (read-only, like snapshot, for debugging purposes only).
+
+## Typescript
+
+this library offers full typescript support.
+
+```typescript
+import type {
+  AtomContextValueType,
+  AtomicContextGettersType,
+  AtomicContextSettersType,
+  ProviderOnChangeType,
+} from 'react-atomic-context'
+
+const initValue = {
+  foo: 'foo',
+  bar: 'bar',
+}
+
+const context = createAtomicContext(initValue)
+
+function Foo() {
+  const { foo, setFoo } = useAtomicContext(context)
+  return foo
+}
+
+function App() {
+  const value = React.useMemo(() => {
+    return {
+      foo: 'foo',
+      bar: 'bar',
+    }
+  }, [])
+  return (
+    <context.Provider value={value}>
+      <Foo />
+    </context.Provider>
+  )
+}
+```
