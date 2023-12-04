@@ -5,29 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>react-atomic-context example</title>
     <script>
-      window.reactVersion = 16
+      // window.reactVersion = '16.8.0'
+      window.reactVersion = '18.2.0'
     </script>
     <script>
-      let imports = {
-        'react-atomic-context': '../dist/index.modern.mjs',
-      }
-      if (reactVersion === 16) {
-        imports = {
-          ...imports,
-          react: 'https://esm.sh/react@16.8.0',
-          'react-dom': 'https://esm.sh/react-dom@16.8.0',
-        }
-      } else {
-        imports = {
-          ...imports,
-          react: 'https://esm.sh/react@18.2.0',
-          'react-dom': 'https://esm.sh/react-dom@18.2.0',
-          'react-dom/': 'https://esm.sh/react-dom@18.2.0/',
-        }
+      const imports = {
+        'react-atomic-context': '../src/index.ts',
+        react: `https://esm.sh/react@${reactVersion}`,
+        'react-dom': `https://esm.sh/react-dom@${reactVersion}`,
+        'react-dom/': `https://esm.sh/react-dom@${reactVersion}/`,
       }
       const script = document.createElement('script')
       script.type = 'importmap'
-      script.innerHTML = JSON.stringify({ imports })
+      script.textContent = JSON.stringify({ imports })
       document.head.appendChild(script)
     </script>
   </head>
