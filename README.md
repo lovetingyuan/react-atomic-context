@@ -144,4 +144,19 @@ type Setters = AtomicContextSettersType<typeof initValue>
  * }
  */
 type Setters = AtomicContextSettersType<typeof initValue, 'foo' | 'baz'>
+
+/**
+ * OnChange = (
+ *  changeInfo:
+ *   | { key: 'foo', value: string, oldValue: string }
+ *   | { key: 'bar', value: number, oldValue: number }
+ *   | { key: 'baz', value: boolean, oldValue: boolean }
+ *  currentValue: {
+ *    foo: string,
+ *    bar: number,
+ *    baz: boolean
+ *  }
+ * ) => void
+ */
+type OnChange = ProviderOnChangeType<typeof initValue>
 ```
