@@ -103,8 +103,6 @@ Overall, the usage of `react-atomic-context` is similar to regular React context
 
 ## Typescript
 
-this library offers full typescript support.
-
 ```typescript
 import type {
   AtomContextValueType,
@@ -115,27 +113,35 @@ import type {
 
 const initValue = {
   foo: 'foo',
-  bar: 'bar',
+  bar: 123,
+  baz: false,
 }
 
 const context = createAtomicContext(initValue)
 
-function Foo() {
-  const { foo, setFoo } = useAtomicContext(context)
-  return foo
-}
+/**
+ * Getters = {
+ *  getFoo: () => string
+ *  getBar: () => number
+ *  getBaz: () => boolean
+ * }
+ */
+type Getters = AtomicContextGettersType<typeof initValue>
 
-function App() {
-  const value = React.useMemo(() => {
-    return {
-      foo: 'foo',
-      bar: 'bar',
-    }
-  }, [])
-  return (
-    <context.Provider value={value}>
-      <Foo />
-    </context.Provider>
-  )
-}
+/**
+ * Setters = {
+ *  setFoo: (newValue: string) => void
+ *  setBar: (newValue: number) => void
+ *  setBaz: (newValue: boolean) => void
+ * }
+ */
+type Setters = AtomicContextSettersType<typeof initValue>
+
+/**
+ * Setters = {
+ *  setFoo: (newValue: string) => void
+ *  setBaz: (newValue: boolean) => void
+ * }
+ */
+type Setters = AtomicContextSettersType<typeof initValue, 'foo' | 'baz'>
 ```
