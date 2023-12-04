@@ -1,7 +1,6 @@
 import React from 'react'
 import { useAtomicContext } from 'react-atomic-context'
-import FooBar from './FooBar.tsx'
-import Siv from './Siv.tsx'
+import Siv from '../Siv.tsx'
 import { RootContext } from './context.ts'
 
 const A = React.memo(() => {
@@ -23,8 +22,6 @@ const A = React.memo(() => {
         {two}
       </button>
       <B></B>
-      <hr />
-      <FooBar />
     </Siv>
   )
 })
@@ -55,15 +52,7 @@ const B = React.memo(() => {
 
 const C = React.memo(() => {
   const aa = useAtomicContext(RootContext)
-  const {
-    four,
-    two,
-    setTwo,
-    setFour,
-    setFive,
-    getFive,
-    get: getContextValue,
-  } = aa;
+  const { four, two, setTwo, setFour, setFive, getFive, get: getContextValue } = aa
   const [, seta] = React.useState(0)
   return (
     <Siv title="CCC">
@@ -108,7 +97,6 @@ export default function Root() {
       three: 'three',
       four: 'four',
       five: 'five',
-      // '': 'dfs'
     }
   }, [])
   return (

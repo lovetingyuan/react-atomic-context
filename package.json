@@ -76,5 +76,10 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lovetingyuan/react-atomic-context.git"
+  },
+  "unbuild": {
+    "failOnWarn": false,
+    "sourcemap": true,
+    "clean": true
   }
 }
