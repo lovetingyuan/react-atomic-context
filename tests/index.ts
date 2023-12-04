@@ -1,7 +1,8 @@
-import { readdirSync } from 'node:fs'
+import { readdirSync, existsSync } from 'node:fs'
 import 'global-jsdom/register'
 import { fileURLToPath } from 'node:url'
-import { dirname } from 'node:path'
+import { dirname, join } from 'node:path'
+import { execSync } from 'node:child_process'
 import React from 'react'
 
 globalThis.React = React
@@ -9,6 +10,12 @@ globalThis.React = React
 const testDir = dirname(fileURLToPath(import.meta.url))
 const regex = /^(?!_).+\.test\.tsx?$/
 const singleFile = process.argv[2]
+
+if (!existsSync(join(testDir, 'node_modules'))) {
+  execSync('npm install --no-package-lock', {
+    cwd: testDir,
+  })
+}
 
 const testFiles = readdirSync(testDir).filter(f => {
   if (!regex.test(f)) {
