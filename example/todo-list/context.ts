@@ -1,9 +1,8 @@
 import React from 'react'
 import {
-  AtomicContextGettersType,
-  AtomicContextSettersType,
   createAtomicContext,
   useAtomicContext,
+  useAtomicContextMethods,
 } from 'react-atomic-context'
 
 export enum Status {
@@ -31,13 +30,11 @@ export type TodoListValueType = typeof initValue
 const TodoContext = createAtomicContext(initValue)
 
 export const useTodoContext = () => useAtomicContext(TodoContext)
+
 export const TodoProvider = TodoContext.Provider
 
-type ListAction = AtomicContextGettersType<TodoListValueType, 'todoList'> &
-  AtomicContextSettersType<TodoListValueType, 'todoList'>
-
 export function useAddTodoItem() {
-  const { getTodoList, setTodoList } = useTodoContext()
+  const { getTodoList, setTodoList } = useAtomicContextMethods(TodoContext)
   return React.useCallback((title: string) => {
     const todoList = getTodoList()
     setTodoList(
@@ -50,40 +47,38 @@ export function useAddTodoItem() {
   }, [])
 }
 
-// export function addTodoItem(title: string, ctx: ListAction) {
-//   const todoList = ctx.getTodoList()
-//   ctx.setTodoList(
-//     todoList.concat({
-//       id: Math.random().toString(),
-//       title,
-//       status: Status.todo,
-//     })
-//   )
-// }
-
-export function changeStatusById(id: string, status: Status, ctx: ListAction) {
-  const list = ctx.getTodoList()
-  const index = list.findIndex(v => v.id === id)
-  const item = list[index]
-  list[index] = {
-    ...item,
-    status,
+export function useChangeStatus() {
+  const { getTodoList, setTodoList } = useTodoContext()
+  return (id: string, status: Status) => {
+    const list = getTodoList()
+    const index = list.findIndex(v => v.id === id)
+    const item = list[index]
+    list[index] = {
+      ...item,
+      status,
+    }
+    setTodoList([...list])
   }
-  ctx.setTodoList([...list])
 }
 
-export function deleteById(id: string, ctx: ListAction) {
-  const list = ctx.getTodoList()
-  ctx.setTodoList(list.filter(v => v.id !== id))
+export function useDeleteItem() {
+  const { getTodoList, setTodoList } = useTodoContext()
+  return (id: string) => {
+    const list = getTodoList()
+    setTodoList(list.filter(v => v.id !== id))
+  }
 }
 
-export function updateItemTitle(id: string, title: string, ctx: ListAction) {
-  const list = ctx.getTodoList()
-  const index = list.findIndex(v => v.id === id)
-  const item = list[index]
-  list[index] = {
-    ...item,
-    title,
+export function useUpdateTitle() {
+  const { getTodoList, setTodoList } = useTodoContext()
+  return (id: string, title: string) => {
+    const list = getTodoList()
+    const index = list.findIndex(v => v.id === id)
+    const item = list[index]
+    list[index] = {
+      ...item,
+      title,
+    }
+    setTodoList([...list])
   }
-  ctx.setTodoList([...list])
 }

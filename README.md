@@ -98,10 +98,11 @@ Overall, the usage of `react-atomic-context` is similar to regular React context
   - The value must be destructured, for example: `const { foo } = useAtomicContext(context)`.
   - For each property, there are two additional methods provided. Such as, for the property foo, both `getFoo` and `setFoo` methods are provided.
   - The `setFoo` method is used to update the value of the `foo` property, while `getFoo` is used solely to obtain the latest value of the `foo` property.
+  - Accessor methods(getters and setters) are reference-stable and do not change, so you can confidently ignore them in dependency arrays.
   - Why provide `getFoo` when we can directly access the value of `foo`? In most cases, there is no need to use `getFoo`. Accessing `foo` directly through destructuring informs React that the current component's rendering depends on the value of `foo`. Thus, when `foo` changes, the current component will be re-rendered. However, there are situations where we only want to retrieve the value of `foo` without caring about its changes. In such cases, you should use the `getFoo` method.
-  - Specifically, this hook will return a method named `get` that returns the current value of the context (read-only, like snapshot, for debugging purposes only).
+  - Specifically, this hook will return a method named `get` that returns the whole current value of the context (read-only, like snapshot, for debugging purposes only).
 
-## Typescript
+## TypeScript support
 
 ```typescript
 import type {

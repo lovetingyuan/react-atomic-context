@@ -2,18 +2,21 @@ import React from 'react'
 import {
   Status,
   TodoItemType,
-  changeStatusById,
-  deleteById,
-  updateItemTitle,
+  useChangeStatus,
+  useDeleteItem,
   useTodoContext,
+  useUpdateTitle,
 } from './context.ts'
 import Siv from '../Siv.tsx'
 
 const TodoItem = React.memo(function TodoItem(props: { item: TodoItemType }) {
   const { title, id, status } = props.item
-  const { setEditingId, editingId, setTodoList, getTodoList } = useTodoContext()
+  const { setEditingId, editingId, } = useTodoContext()
   const editing = editingId === id
   const inputRef = React.useRef<HTMLInputElement | null>(null)
+  const changeStatus = useChangeStatus()
+  const deleteItem = useDeleteItem()
+  const updateTitle = useUpdateTitle()
   return (
     <Siv title="item">
       <p>
@@ -24,9 +27,9 @@ const TodoItem = React.memo(function TodoItem(props: { item: TodoItemType }) {
               status === Status.todo
                 ? Status.doing
                 : status === Status.doing
-                ? Status.done
-                : Status.todo
-            changeStatusById(id, newStatus, { setTodoList, getTodoList })
+                  ? Status.done
+                  : Status.todo
+            changeStatus(id, newStatus)
           }}
         >
           - {status}
@@ -36,7 +39,7 @@ const TodoItem = React.memo(function TodoItem(props: { item: TodoItemType }) {
             onClick={() => {
               const newTitle = inputRef.current?.value.trim()
               if (newTitle) {
-                updateItemTitle(id, newTitle, { setTodoList, getTodoList })
+                updateTitle(id, newTitle)
                 setEditingId('')
               }
             }}
@@ -55,7 +58,7 @@ const TodoItem = React.memo(function TodoItem(props: { item: TodoItemType }) {
         <span
           onClick={() => {
             if (confirm('delete this?')) {
-              deleteById(id, { getTodoList, setTodoList })
+              deleteItem(id)
             }
           }}
         >

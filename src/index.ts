@@ -15,6 +15,7 @@ import type {
   AtomicContextSettersType,
   ProviderOnChangeType,
   AtomicProviderType,
+  AtomContextMethodsType,
 } from './types.ts'
 
 const notUnderProviderError = 'components using useAtomicContext must be wrapped by the Provider.'
@@ -188,6 +189,12 @@ export function useAtomicContext<T extends Record<string, unknown>>({
     })
     return Object.freeze(obj)
   }, [])
+}
+
+export function useAtomicContextMethods<T extends Record<string, unknown>>(
+  context: AtomicContextType<T>
+): AtomContextMethodsType<T> {
+  return Object.getPrototypeOf(useAtomicContext(context))
 }
 
 export type {

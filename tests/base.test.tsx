@@ -14,7 +14,7 @@ const A = React.memo(function A() {
   const { aaa, setAaa } = useAtomicContext(context);
   const updateCount = React.useRef(1).current++
   return <div>
-    <p data-testid="dksflj" onClick={() => {
+    <p data-testid="aaaa" onClick={() => {
       setAaa(aaa.toUpperCase() + updateCount)
     }}>{aaa}</p>
     <B />
@@ -25,7 +25,7 @@ const B = React.memo(function B() {
   const { bbb, setBbb } = useAtomicContext(context);
   const updateCount = React.useRef(10).current++
   return <div>
-    <p data-testid="rhdsf" onClick={() => {
+    <p data-testid="bbbb" onClick={() => {
       setBbb('bbb' + updateCount)
     }}>{bbb}</p>
   </div>
@@ -51,13 +51,13 @@ describe('test-foo', () => {
   })
   it('foo-test', () => {
     render(<App />)
-    const p = screen.getByTestId('dksflj')
+    const p = screen.getByTestId('aaaa')
     assert.ok(p.textContent?.includes('aaa'))
     fireEvent.click(p)
     assert.equal(p.textContent, 'AAA1')
     fireEvent.click(p)
     assert.equal(p.textContent, 'AAA12')
-    const pp = screen.getByTestId('rhdsf');
+    const pp = screen.getByTestId('bbbb');
     assert.ok(pp.textContent?.includes('bibibi'))
     fireEvent.click(pp)
     assert.equal(pp.textContent, 'bbb10')
@@ -68,17 +68,17 @@ describe('test-foo', () => {
   // not concurrent mode
   it('foo-test', () => {
     assert.throws(() => {
-      screen.getByTestId('dksflj')
+      screen.getByTestId('aaaa')
     })
 
     render(<App />, { legacyRoot: true })
-    const p = screen.getByTestId('dksflj')
+    const p = screen.getByTestId('aaaa')
     assert.ok(p.textContent?.includes('aaa'))
     fireEvent.click(p)
     assert.equal(p.textContent, 'AAA1')
     fireEvent.click(p)
     assert.equal(p.textContent, 'AAA12')
-    const pp = screen.getByTestId('rhdsf');
+    const pp = screen.getByTestId('bbbb');
     assert.ok(pp.textContent?.includes('bibibi'))
     fireEvent.click(pp)
     assert.equal(pp.textContent, 'bbb10')
