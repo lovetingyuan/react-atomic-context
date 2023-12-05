@@ -1,18 +1,19 @@
 import React from 'react'
-import { Status, addTodoItem, useTodoContext } from './context.ts'
+import { Status, useAddTodoItem, useTodoContext } from './context.ts'
 import Siv from '../Siv.tsx'
 
 const Header = React.memo(function Header() {
-  const { setTodoList, getTodoList, status, setStatus } = useTodoContext()
+  const { setStatus, getStatus } = useTodoContext()
+  const addTodoItem = useAddTodoItem()
   return (
-    <Siv title='header'>
+    <Siv title="header">
       <form
         onSubmit={e => {
           e.preventDefault()
           const input = (e.target as any).elements.input
           const value = input.value.trim()
           if (value) {
-            addTodoItem(value, { setTodoList, getTodoList })
+            addTodoItem(value)
           }
           input.value = ''
         }}
@@ -26,8 +27,8 @@ const Header = React.memo(function Header() {
                 type="radio"
                 id={s}
                 name="status"
-                checked={s === status}
-                value={s}
+                defaultChecked={s === getStatus()}
+                defaultValue={s}
                 onChange={e => {
                   setStatus(e.target.value as Status)
                 }}

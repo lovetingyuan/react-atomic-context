@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   AtomicContextGettersType,
   AtomicContextSettersType,
@@ -35,16 +36,30 @@ export const TodoProvider = TodoContext.Provider
 type ListAction = AtomicContextGettersType<TodoListValueType, 'todoList'> &
   AtomicContextSettersType<TodoListValueType, 'todoList'>
 
-export function addTodoItem(title: string, ctx: ListAction) {
-  const todoList = ctx.getTodoList()
-  ctx.setTodoList(
-    todoList.concat({
-      id: Math.random().toString(),
-      title,
-      status: Status.todo,
-    })
-  )
+export function useAddTodoItem() {
+  const { getTodoList, setTodoList } = useTodoContext()
+  return React.useCallback((title: string) => {
+    const todoList = getTodoList()
+    setTodoList(
+      todoList.concat({
+        id: Math.random().toString(),
+        title,
+        status: Status.todo,
+      })
+    )
+  }, [])
 }
+
+// export function addTodoItem(title: string, ctx: ListAction) {
+//   const todoList = ctx.getTodoList()
+//   ctx.setTodoList(
+//     todoList.concat({
+//       id: Math.random().toString(),
+//       title,
+//       status: Status.todo,
+//     })
+//   )
+// }
 
 export function changeStatusById(id: string, status: Status, ctx: ListAction) {
   const list = ctx.getTodoList()

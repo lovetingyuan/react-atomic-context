@@ -21,11 +21,14 @@ const TodoItem = React.memo(function TodoItem(props: { item: TodoItemType }) {
         <span
           onClick={() => {
             const newStatus =
-              status === Status.todo ? Status.doing : status === Status.doing ? Status.done : Status.todo
+              status === Status.todo
+                ? Status.doing
+                : status === Status.doing
+                ? Status.done
+                : Status.todo
             changeStatusById(id, newStatus, { setTodoList, getTodoList })
           }}
         >
-          {' '}
           - {status}
         </span>
         {editing ? (
