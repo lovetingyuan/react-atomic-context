@@ -1,10 +1,9 @@
 import React from 'react'
-import { useAtomicContext } from 'react-atomic-context'
 import Siv from '../Siv.tsx'
-import { RootContext } from './context.ts'
+import { Provider, useBaseContext } from './context.ts'
 
 const A = React.memo(() => {
-  const { one, setOne, two, setTwo } = useAtomicContext(RootContext)
+  const { one, setOne, two, setTwo } = useBaseContext()
   return (
     <Siv title="AAA">
       <button
@@ -27,8 +26,7 @@ const A = React.memo(() => {
 })
 
 const B = React.memo(() => {
-  const a = useAtomicContext(RootContext)
-  const { three, setThree, setFive, five } = a
+  const { three, setThree, setFive, five } = useBaseContext()
   return (
     <Siv title={'BBB'}>
       <button
@@ -51,8 +49,7 @@ const B = React.memo(() => {
 })
 
 const C = React.memo(() => {
-  const aa = useAtomicContext(RootContext)
-  const { four, two, setTwo, setFour, setFive, getFive, get: getContextValue } = aa
+  const { four, two, setTwo, setFour, setFive, getFive, get: getContextValue } = useBaseContext()
   const [, seta] = React.useState(0)
   return (
     <Siv title="CCC">
@@ -100,7 +97,7 @@ export default function Root() {
     }
   }, [])
   return (
-    <RootContext.Provider
+    <Provider
       value={init}
       onChange={info => {
         console.log('value changed', info)
@@ -108,6 +105,6 @@ export default function Root() {
     >
       <h2>React Atomic Context</h2>
       <A></A>
-    </RootContext.Provider>
+    </Provider>
   )
 }

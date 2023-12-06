@@ -1,4 +1,4 @@
-import { createAtomicContext } from 'react-atomic-context'
+import { createAtomicContext, useAtomicContext } from 'react-atomic-context'
 
 const RootContext = createAtomicContext({
   one: 'one',
@@ -8,4 +8,5 @@ const RootContext = createAtomicContext({
   five: 'five',
 })
 
-export { RootContext }
+export const useBaseContext = () => useAtomicContext(RootContext)
+export const Provider = RootContext.Provider

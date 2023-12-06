@@ -46,7 +46,6 @@
     "prepublishOnly": "npm run build && npm test",
     "build:cjs": "npx tsc --target es2020 --module commonjs --declaration --esModuleInterop --skipLibCheck --outDir dist/cjs src/index.ts",
     "build:esm": "npx tsc --target es5 --module es2020 --outdir dist/esm --declaration --allowSyntheticDefaultImports --skipLibCheck src/index.ts",
-    "build:umd": "npx tsc --target es5 --module umd --globalName ReactAtomicContext --outdir dist/umd --declaration --allowSyntheticDefaultImports --skipLibCheck src/index.ts",
     "publish": "npx np"
   },
   "keywords": [

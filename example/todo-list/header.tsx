@@ -1,6 +1,7 @@
 import React from 'react'
-import { Status, useAddTodoItem, useTodoContext } from './context.ts'
+import { Status, useTodoContext } from './context.ts'
 import Siv from '../Siv.tsx'
+import { useAddTodoItem } from './actions.ts'
 
 const Header = React.memo(function Header() {
   const { setStatus, getStatus } = useTodoContext()

@@ -6,6 +6,16 @@ For this issue, this library provides a simple solution.
 
 You can use this library to individually read and write each property in React context without worrying about triggering a full re-render of all related components under the context.
 
+## Install:
+
+`npm i react-atomic-context`
+
+`yarn add react-atomic-context`
+
+`pnpm install react-atomic-context`
+
+Only `3kB` size.
+
 ## Example:
 
 ```tsx
@@ -147,6 +157,8 @@ type Setters = AtomicContextSettersType<typeof initValue>
 type Setters = AtomicContextSettersType<typeof initValue, 'foo' | 'baz'>
 
 /**
+ * type of "onChange" callback type passed to Provider.
+ *
  * OnChange = (
  *  changeInfo:
  *   | { key: 'foo', value: string, oldValue: string }

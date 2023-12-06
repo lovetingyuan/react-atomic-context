@@ -1,17 +1,11 @@
 import React from 'react'
-import {
-  Status,
-  TodoItemType,
-  useChangeStatus,
-  useDeleteItem,
-  useTodoContext,
-  useUpdateTitle,
-} from './context.ts'
+import { Status, TodoItemType, useTodoContext } from './context.ts'
 import Siv from '../Siv.tsx'
+import { useChangeStatus, useDeleteItem, useUpdateTitle } from './actions.ts'
 
 const TodoItem = React.memo(function TodoItem(props: { item: TodoItemType }) {
   const { title, id, status } = props.item
-  const { setEditingId, editingId, } = useTodoContext()
+  const { setEditingId, editingId } = useTodoContext()
   const editing = editingId === id
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const changeStatus = useChangeStatus()
@@ -27,8 +21,8 @@ const TodoItem = React.memo(function TodoItem(props: { item: TodoItemType }) {
               status === Status.todo
                 ? Status.doing
                 : status === Status.doing
-                  ? Status.done
-                  : Status.todo
+                ? Status.done
+                : Status.todo
             changeStatus(id, newStatus)
           }}
         >
