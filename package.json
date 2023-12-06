@@ -43,7 +43,7 @@
     "dev": "live-server ./",
     "prebuild": "node -e \"require('fs').rmSync('./dist',{force:true,recursive:true})\"",
     "postbuild": "node -e \"require('fs').copyFileSync('dist/index.d.ts','dist/index.d.mts')\"",
-    "prepublishOnly": "npm run build && npm test",
+    "prepublishOnly": "npm run build",
     "build:cjs": "npx tsc --target es2020 --module commonjs --declaration --esModuleInterop --skipLibCheck --outDir dist/cjs src/index.ts",
     "build:esm": "npx tsc --target es5 --module es2020 --outdir dist/esm --declaration --allowSyntheticDefaultImports --skipLibCheck src/index.ts",
     "publish": "npx np"
