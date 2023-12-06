@@ -18,7 +18,10 @@ import type {
   AtomContextMethodsType,
 } from './types.ts'
 
-const notUnderProviderError = 'components using useAtomicContext must be wrapped by the Provider.'
+const name = 'react-atomic-context'
+
+const notUnderProviderError =
+  name + ': components using useAtomicContext must be wrapped by the Provider.'
 
 /**
  * create a new atomic context.
@@ -32,7 +35,9 @@ export function createAtomicContext<T extends Record<string, unknown>>(
   Object.seal(initValue)
   const contexts = Object.create(null) as ContextsType<T>
   if (Object.prototype.toString.call(initValue) !== '[object Object]') {
-    throw new Error('"initValue" passed to createAtomicContext is required and must be object.')
+    throw new Error(
+      name + ': "initValue" passed to createAtomicContext is required and must be object.'
+    )
   }
   const allKeys = Object.keys(initValue) as (keyof T)[]
   for (const key of allKeys) {
@@ -77,13 +82,13 @@ export function createAtomicContext<T extends Record<string, unknown>>(
   const Provider: AtomicProviderType<T> = props => {
     const initValueRef = React.useRef(props.value)
     if (initValueRef.current !== props.value) {
-      console.warn('"value" passed to Provider can not be changed, please use useMemo.')
+      console.warn(name + ': "value" passed to Provider can not be changed, please use useMemo.')
     }
     if (Object.prototype.toString.call(props.value) !== '[object Object]') {
-      throw new Error('"value" prop of Provider is required and must be object.')
+      throw new Error(name + ': "value" prop of Provider is required and must be object.')
     }
     if (props.onChange && typeof props.onChange !== 'function') {
-      throw new Error('"onChange" prop of Provider must be a function.')
+      throw new Error(name + ': "onChange" prop of Provider must be a function.')
     }
     const keys = Object.keys(initValueRef.current) as (keyof T)[]
     const valueRef = React.useRef<T>(initValueRef.current)
@@ -100,7 +105,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     for (const key of keys) {
       if (!(key in contexts)) {
         throw new Error(
-          `property "${String(
+          `${name}: property "${String(
             key
           )}" does not exist in the initial value passed to createAtomicContext.`
         )
@@ -187,7 +192,8 @@ export function useAtomicContextMethods<T extends Record<string, unknown>>(
     const getterSetters: Record<string, unknown> = Object.create({
       get() {
         console.warn(
-          'The "get" method is only used for development purposes to view the current value of the context.'
+          name +
+            ': The "get" method is only used for development purposes to view the current value of the context.'
         )
         return Object.freeze({ ...contextValue.current })
       },
