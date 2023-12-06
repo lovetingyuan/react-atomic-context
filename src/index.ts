@@ -153,11 +153,33 @@ export function createAtomicContext<T extends Record<string, unknown>>(
  * @param param atomic context created by `createAtomicContext`
  * @returns context value with getters and setters of each property.
  */
-export function useAtomicContext<T extends Record<string, unknown>>({
-  _contexts,
-  _atomicContext,
-}: AtomicContextType<T>) {
-  const { getters, setters, contextValue } = React.useContext(_atomicContext)
+export function useAtomicContext<T extends Record<string, unknown>>(context: AtomicContextType<T>) {
+  const methods = useAtomicContextMethods(context)
+  const { _contexts } = context
+  return React.useMemo(() => {
+    const obj = Object.create(methods) as AtomContextValueType<T>
+    Object.keys(_contexts).forEach(key => {
+      Object.defineProperty(obj, key, {
+        get() {
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          return React.useContext(_contexts[key])
+        },
+      })
+    })
+    return Object.freeze(obj)
+  }, [])
+}
+
+/**
+ * react hook to read getters and setters methods of an atomic context.
+ * see: https://github.com/lovetingyuan/react-atomic-context#readme
+ * @param param atomic context created by `createAtomicContext`
+ * @returns getters and setters methods of each property.
+ */
+export function useAtomicContextMethods<T extends Record<string, unknown>>(
+  context: AtomicContextType<T>
+): AtomContextMethodsType<T> {
+  const { getters, setters, contextValue } = React.useContext(context._atomicContext)
   if (!setters || !getters || !contextValue) {
     throw new Error(notUnderProviderError)
   }
@@ -178,23 +200,8 @@ export function useAtomicContext<T extends Record<string, unknown>>({
     Object.keys(_setters).forEach(k => {
       getterSetters[`set${k[0].toUpperCase()}${k.slice(1)}`] = _setters[k]
     })
-    const obj = Object.create(Object.freeze(getterSetters)) as AtomContextValueType<T>
-    Object.keys(_contexts).forEach(key => {
-      Object.defineProperty(obj, key, {
-        get() {
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          return React.useContext(_contexts[key])
-        },
-      })
-    })
-    return Object.freeze(obj)
+    return Object.freeze(getterSetters) as AtomContextMethodsType<T>
   }, [])
-}
-
-export function useAtomicContextMethods<T extends Record<string, unknown>>(
-  context: AtomicContextType<T>
-): AtomContextMethodsType<T> {
-  return Object.getPrototypeOf(useAtomicContext(context))
 }
 
 export type {
