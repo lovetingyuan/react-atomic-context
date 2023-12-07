@@ -17,8 +17,7 @@ import type {
   AtomicProviderType,
   AtomContextMethodsType,
 } from './types.ts'
-
-const name = 'react-atomic-context'
+import { name } from '../package.json'
 
 const notUnderProviderError =
   name + ': components using useAtomicContext must be wrapped by the Provider.'
@@ -56,7 +55,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
   })
   AtomicContext.displayName = 'AtomicContext'
 
-  const AtomProvider = React.memo(function AtomProvider(
+  const AtomProviderWrapper = React.memo(function AtomProviderWrapper(
     props: React.PropsWithChildren<{
       keyName: keyof T
       onChangeRef: React.RefObject<ProviderOnChangeType<T> | undefined>
@@ -116,7 +115,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
         }
       }
       provider = React.createElement(
-        AtomProvider,
+        AtomProviderWrapper,
         {
           keyName: key,
           onChangeRef,
@@ -210,9 +209,4 @@ export function useAtomicContextMethods<T extends Record<string, unknown>>(
   }, [])
 }
 
-export type {
-  AtomContextValueType,
-  AtomicContextGettersType,
-  AtomicContextSettersType,
-  ProviderOnChangeType,
-}
+export type { AtomicContextGettersType, AtomicContextSettersType, ProviderOnChangeType }
