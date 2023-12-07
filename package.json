@@ -43,7 +43,7 @@
     "build": "unbuild",
     "dev": "live-server ./",
     "prepublishOnly": "npm run build && npm test",
-    "publish": "npx np"
+    "pub": "npx np"
   },
   "keywords": [
     "react",
