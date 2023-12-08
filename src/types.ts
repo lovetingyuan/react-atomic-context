@@ -32,9 +32,12 @@ export type AtomicContextSettersType<
   [k in K as GetSetKey<k, 'set'>]: (newValue: T[k]) => void
 }
 
-export type AtomContextMethodsType<T extends Record<string, unknown>> = Omit<
-  AtomicContextSettersType<T> &
-    AtomicContextGettersType<T> & {
+export type AtomContextMethodsType<
+  T extends Record<string, unknown>,
+  K extends keyof T = keyof T
+> = Omit<
+  AtomicContextSettersType<T, K> &
+    AtomicContextGettersType<T, K> & {
       /** get current context value */
       get: () => Readonly<T>
     },
