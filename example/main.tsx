@@ -34,21 +34,18 @@ function App() {
 }
 
 async function start() {
+  const app = (
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  )
+  const container = document.getElementById('root')!
   if (React.version.startsWith('18.')) {
     const ReactDOM = await import('react-dom/client')
-    ReactDOM.createRoot(document.getElementById('root')!).render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    )
+    ReactDOM.createRoot(container).render(app)
   } else {
     const ReactDOM = (await import('react-dom')).default
-    ReactDOM.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>,
-      document.getElementById('root')!
-    )
+    ReactDOM.render(app, container)
   }
 }
 
