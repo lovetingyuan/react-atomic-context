@@ -36,10 +36,28 @@ function convertCssToJs(cssCode) {
 const style = document.createElement('style');
 style.textContent = \`${cssCode}\`;
 document.head.appendChild(style);
+export default style;
 `.trim()
 }
 
-const fileExts = ['tsx', 'ts', 'css']
+function convertJsonToJs(code) {
+  const json = JSON.parse(code)
+  const keys = Object.keys(json).map(key => {
+    try {
+      new Function(`var ${key};`)
+      return key
+    } catch (e) {
+      return ''
+    }
+  })
+  return `
+const __$JSon = ${code}
+export default __$JSon
+export const {${keys}} = __$JSon
+`.trim()
+}
+
+const fileExts = ['tsx', 'ts', 'css', 'json']
 
 self.addEventListener('fetch', event => {
   const url = event.request.url
@@ -54,6 +72,8 @@ self.addEventListener('fetch', event => {
             javascriptCode = convertTsxToJs(code)
           } else if (url.endsWith('.css')) {
             javascriptCode = convertCssToJs(code)
+          } else if (url.endsWith('.json')) {
+            javascriptCode = convertJsonToJs(code)
           }
           // 创建新的 Response 对象，将转换后的 JavaScript 代码作为响应内容
           const convertedResponse = new Response(javascriptCode, {
