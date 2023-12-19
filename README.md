@@ -98,19 +98,153 @@ Overall, the usage of `react-atomic-context` is similar to regular React context
 
 - createAtomicContext
 
-  - Used to create a context, similar to `React.createContext`, but it requires an object as the initial value.
-  - The created context provides a Provider component, which wraps the components to be rendered. It must be provided with a prop named `value`, whose value is typically similar to the initial value and contains properties consistent with the initial value. Changing value of `value` prop won't take effect.
+  - This method is used to create a context, similar to `React.createContext`, but it requires an object as the initial value.
+    eg:
+
+    ```js
+    import { createAtomicContext } from 'react-atomic-context'
+    // The initial value is required and can only be one object
+    const AppContext = createAtomicContext({
+      foo: 'foo',
+      bar: 'bar',
+    })
+    export { AppContext }
+    ```
+
+  - The created context provides a `Provider` component, which wraps the components to be rendered. It must be provided with a prop named `value`, whose value is typically similar to the initial value and contains properties consistent with the initial value. Changing value of `value` prop won't take effect.
+    eg:
+
+    ```js
+    const App = () => {
+      // Right way
+      const initValue = React.useMemo(() => {
+        return {
+          foo: 'foooo',
+          bar: 'barrr',
+        }
+      }, [])
+      // Wrong! "initValue" can not change, the provider does not care about the overall change of the initial value
+      const initValue = {
+        foo: 'foooo',
+        bar: 'barrr',
+      }
+      // Wrong! Because "baz" is not in AppContext initial value.
+      const initValue = React.useMemo(() => {
+        return {
+          foo: 'foooo',
+          bar: 'barrr',
+          baz: 'bazzz', // baz is invalid here.
+        }
+      }, [])
+      return (
+        <AppContext.Provider value={initValue}>
+          <YourComponent />
+        </AppContext.Provider>
+      )
+    }
+    ```
+
   - The Provider component also provides an additional `onChange` prop that accepts a function, which is called whenever any property changes.
-  - There is no "Consumer" component available in `react-atomic-context`. We only support accessing the context through calling `useAtomicContext`.
+    eg:
+
+    ```js
+    const App = () => {
+      const initValue = React.useMemo(() => {
+        return {
+          foo: 'foooo',
+          bar: 'barrr',
+        }
+      }, [])
+      const handleChange = React.useCallback(({ key, value, oldValue }, currentValue) => {
+        console.log(`${key} changed from ${oldValue} to ${value}`)
+        console.log('the current value of context is', currentValue)
+      }, [])
+      return (
+        <AppContext.Provider value={initValue} onChange={handleChange}>
+          <YourComponent />
+        </AppContext.Provider>
+      )
+    }
+    ```
+
+  - There is no "Consumer" component available. The lib only supports accessing the context through calling `useAtomicContext`.
 
 - useAtomicContext
-  - Used to retrieve the current value from the context (provided by the nearest Provider's `value` prop).
-  - The value must be destructured, for example: `const { foo } = useAtomicContext(context)`.
-  - For each property, there are two additional methods provided. Such as, for the property foo, both `getFoo` and `setFoo` methods are provided.
-  - The `setFoo` method is used to update the value of the `foo` property, while `getFoo` is used solely to obtain the latest value of the `foo` property.
-  - Accessor methods(getters and setters) are reference-stable and do not change, so you can confidently ignore them in dependency arrays.
-  - Why provide `getFoo` when we can directly access the value of `foo`? In most cases, there is no need to use `getFoo`. Accessing `foo` directly through destructuring informs React that the current component's rendering depends on the value of `foo`. Thus, when `foo` changes, the current component will be re-rendered. However, there are situations where we only want to retrieve the value of `foo` without caring about its changes. In such cases, you should use the `getFoo` method.
-  - Specifically, this hook will return a method named `get` that returns the whole current value of the context (read-only, like snapshot, for debugging purposes only).
+
+  - This method is used to retrieve the current value from the context (provided by the nearest Provider's `value` prop).
+  - The value must be **accessed using deconstructed syntax**, for example: `const { foo } = useAtomicContext(context)`.
+    eg:
+
+    ```js
+    import { useAtomicContext } from 'react-atomic-context'
+
+    const MyComponent = () => {
+      // Right way
+      const { foo, bar } = useAtomicContext(AppContext)
+      if (foo) {
+        return <div>{foo}</div>
+      }
+      return <div>{bar}</div>
+      // Wrong!
+      const value = useAtomicContext(AppContext)
+      if (value.foo) {
+        return <div>{value.foo}</div>
+      }
+      return <div>{value.bar}</div>
+    }
+    ```
+
+  - For each property, there are two additional methods provided. Such as, for the property foo, both `getFoo` and `setFoo` methods are provided. The `setFoo` method is used to update the value of the `foo` property, while `getFoo` is used solely to obtain the latest value of the `foo` property(in most case, just use `foo` instead of calling `getFoo`).
+    eg:
+
+    ```js
+    const MyComponent = () => {
+      const { foo, setFoo, getFoo } = useAtomicContext(AppContext)
+      return (
+        <div
+          onClick={() => {
+            setFoo(newValue)
+          }}
+        >
+          {foo}
+        </div>
+      )
+    }
+    ```
+
+  - Accessor methods(getters and setters) are reference-stable and will not change, so you can confidently ignore them in dependency arrays.
+    eg:
+
+    ```js
+    const MyComponent = () => {
+      const { bar, setFoo, getFoo } = useAtomicContext(AppContext)
+      React.useEffect(() => {
+        if (getFoo() !== bar) {
+          setFoo(bar)
+        }
+      }, [bar]) // It is safe to omit getFoo and setFoo here.
+      return <div>...</div>
+    }
+    ```
+
+  - Specifically, this hook will return a method named `get` that returns the whole current value of the context (the returned value is read-only, like snapshot of state, for debugging purposes only).
+    eg:
+
+    ```js
+    const MyComponent = () => {
+      const { get } = useAtomicContext(AppContext)
+
+      return (
+        <div
+          onClick={() => {
+            console.log('current value of context is', get())
+          }}
+        >
+          inspect current value
+        </div>
+      )
+    }
+    ```
 
 ## TypeScript support
 
@@ -173,3 +307,21 @@ type Setters = AtomicContextSettersType<typeof initValue, 'foo' | 'baz'>
  */
 type OnChange = ProviderOnChangeType<typeof initValue>
 ```
+
+## Q&A
+
+1. Why provide `getFoo` when we can directly access the value of `foo`?
+
+   In most cases, there is no need to use `getFoo`. Accessing `foo` directly through destructuring informs React that the current component's rendering depends on the value of `foo`. Thus, when `foo` changes, the current component will be re-rendered. However, there are situations where we only want to retrieve the value of `foo` without caring about its changes. In such cases, you should use the `getFoo` method.
+
+2. Why do I have to keep the Provider's `value` prop reference-stable?
+
+   To ensure that the context of data changes has a stable single way, that is, by calling the setter method corresponding to the property.
+   This also explains why the value passed to the provider cannot contain additional properties relative to the initial value when creating the context.
+
+3. Why must context data be accessed in a deconstructed manner?
+
+   Virtually every access to a context property is preceded by a call to `useContext`, so the property access order must be kept steady and comply with react hook requirements.
+   And it's always a good programming practice to declare the properties and methods to be accessed in a deconstructed way at the beginning, which is clearer and easier to maintain your component.
+
+Thank you very much and hope to raise any questions.
