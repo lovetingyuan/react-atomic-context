@@ -70,6 +70,7 @@ export type RootValue<T extends Record<string, unknown>> = {
   getters: React.MutableRefObject<GettersType<T>> | null
   setters: React.MutableRefObject<SettersType<T>> | null
   contextValue: React.MutableRefObject<T> | null
+  onChange: React.MutableRefObject<ProviderOnChangeType<T> | undefined> | null
 }
 
 /**

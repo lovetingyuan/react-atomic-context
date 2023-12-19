@@ -52,17 +52,15 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     getters: null,
     setters: null,
     contextValue: null,
+    onChange: null,
   })
   AtomicContext.displayName = 'AtomicContext'
 
   const AtomProviderWrapper = React.memo(function AtomProviderWrapper(
-    props: React.PropsWithChildren<{
-      keyName: keyof T
-      onChangeRef: React.RefObject<ProviderOnChangeType<T> | undefined>
-    }>
+    props: React.PropsWithChildren<{ valueKey: keyof T }>
   ) {
-    const key = props.keyName
-    const { contextValue, setters } = React.useContext(AtomicContext)
+    const key = props.valueKey
+    const { contextValue, setters, onChange } = React.useContext(AtomicContext)
     if (!contextValue || !setters) {
       throw new Error(notUnderProviderError)
     }
@@ -72,7 +70,9 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     setters.current[key] = React.useCallback(value => {
       setVal(value)
       contextValue.current[key] = value
-      props.onChangeRef.current?.({ key, value, oldValue: valRef.current }, contextValue.current)
+      if (onChange && onChange.current) {
+        onChange.current({ key, value, oldValue: valRef.current }, contextValue.current)
+      }
     }, [])
 
     return React.createElement(contexts[key].Provider, { value: val }, props.children)
@@ -86,7 +86,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     if (Object.prototype.toString.call(props.value) !== '[object Object]') {
       throw new Error(name + ': "value" prop of Provider is required and must be object.')
     }
-    if (props.onChange && typeof props.onChange !== 'function') {
+    if ('onChange' in props && typeof props.onChange !== 'function') {
       throw new Error(name + ': "onChange" prop of Provider must be a function.')
     }
     const keys = Object.keys(initValueRef.current) as (keyof T)[]
@@ -117,8 +117,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
       provider = React.createElement(
         AtomProviderWrapper,
         {
-          keyName: key,
-          onChangeRef,
+          valueKey: key,
         },
         provider
       )
@@ -131,6 +130,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
         getters: gettersRef,
         setters: settersRef,
         contextValue: valueRef,
+        onChange: onChangeRef,
       } satisfies RootValue<T>
     }, [])
     return React.createElement(AtomicContext.Provider, { value: rootValue }, provider)
