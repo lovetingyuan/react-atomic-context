@@ -1,4 +1,4 @@
-# react-atomic-context
+# react-atomic-context [![npm version](https://img.shields.io/npm/v/react-atomic-context)](https://www.npmjs.com/package/react-atomic-context)
 
 When we use React Context, we often face the problem that when the Provider's value changes (e.g., when a component below it modifies a property in the value), all components that use that context are re-rendered, even if they do not depend on the changed property value. This can lead to unnecessary re-renders and negatively impact the performance of our application.
 
@@ -111,7 +111,8 @@ Overall, the usage of `react-atomic-context` is similar to regular React context
     export { AppContext }
     ```
 
-  - The created context provides a `Provider` component, which wraps the components to be rendered. It must be provided with a prop named `value`, whose value is typically similar to the initial value and contains properties consistent with the initial value. Changing value of `value` prop won't take effect.
+  - The created context provides a `Provider` component, which wraps the components to be rendered. It must be provided with a prop named `value`, whose value is typically similar to the initial value and contains properties consistent with the initial value(can not contain any extra properties).
+    Changing value of `value` prop won't take effect.
     eg:
 
     ```js
@@ -172,7 +173,7 @@ Overall, the usage of `react-atomic-context` is similar to regular React context
 - useAtomicContext
 
   - This method is used to retrieve the current value from the context (provided by the nearest Provider's `value` prop).
-  - The value must be **accessed using deconstructed syntax**, for example: `const { foo } = useAtomicContext(context)`.
+    The value must be **accessed using deconstructed syntax**, for example: `const { foo } = useAtomicContext(context)`.
     eg:
 
     ```js
@@ -194,7 +195,7 @@ Overall, the usage of `react-atomic-context` is similar to regular React context
     }
     ```
 
-  - For each property, there are two additional methods provided. Such as, for the property foo, both `getFoo` and `setFoo` methods are provided. The `setFoo` method is used to update the value of the `foo` property, while `getFoo` is used solely to obtain the latest value of the `foo` property(in most case, just use `foo` instead of calling `getFoo`).
+  - For each property, there are two additional methods provided. Such as, for the property `foo`, both `getFoo` and `setFoo` methods are provided. The `setFoo` method is the **only way** to update the value of the `foo` property, while `getFoo` is used solely to obtain the latest value of the `foo` property(in most case, just use `foo` instead of calling `getFoo`).
     eg:
 
     ```js
@@ -227,7 +228,7 @@ Overall, the usage of `react-atomic-context` is similar to regular React context
     }
     ```
 
-  - Specifically, this hook will return a method named `get` that returns the whole current value of the context (the returned value is read-only, like snapshot of state, for debugging purposes only).
+  - Specifically, this hook will return a method named `get` that returns the whole current value of the context (the returned value is read-only, like snapshot of state, for **debugging purposes only**).
     eg:
 
     ```js
