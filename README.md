@@ -325,4 +325,10 @@ type OnChange = ProviderOnChangeType<typeof initValue>
    Virtually every access to a context property is preceded by a call to `useContext`, so the property access order must be kept steady and comply with react hook requirements.
    And it's always a good programming practice to declare the properties and methods to be accessed in a deconstructed way at the beginning, which is clearer and easier to maintain your component.
 
+4. Why my component still get rerendered?
+
+   Important point but easy to ignore is that **do not forget to use `React.memo` to wrap your component**.
+   By the way, There are a fews reasons leading to react component rerender. Such as calling setState, using normal react context, changing the key of the component, etc.
+   
+
 Thank you very much and hope to raise any questions.
