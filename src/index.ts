@@ -24,7 +24,7 @@ const notUnderProviderError =
 
 /**
  * create a new atomic context.
- * see: https://github.com/lovetingyuan/react-atomic-context#readme
+ * @see https://github.com/lovetingyuan/react-atomic-context#readme
  * @param initValue initial value for creating a new atomic context, required.
  * @returns a new atomic context
  */
@@ -153,7 +153,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
 
 /**
  * react hook to read value from an atomic context.
- * see: https://github.com/lovetingyuan/react-atomic-context#readme
+ * @see https://github.com/lovetingyuan/react-atomic-context#readme
  * @param param atomic context created by `createAtomicContext`
  * @returns context value with getters and setters of each property.
  */
@@ -176,7 +176,7 @@ export function useAtomicContext<T extends Record<string, unknown>>(context: Ato
 
 /**
  * react hook to read getters and setters methods of an atomic context.
- * see: https://github.com/lovetingyuan/react-atomic-context#readme
+ * @see https://github.com/lovetingyuan/react-atomic-context#readme
  * @param param atomic context created by `createAtomicContext`
  * @returns getters and setters methods of each property.
  */
