@@ -59,7 +59,7 @@ export type ProviderOnChangeType<T extends Record<string, unknown>> = (
   changeInfo: {
     [K in keyof T]: { key: K; value: T[K]; oldValue: T[K] }
   }[keyof T],
-  currentValue: T
+  methods: AtomContextMethodsType<T>
 ) => void
 
 export type ContextsType<T extends Record<string, unknown>> = {

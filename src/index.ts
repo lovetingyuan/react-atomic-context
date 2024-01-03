@@ -60,6 +60,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     props: React.PropsWithChildren<{ valueKey: keyof T }>
   ) {
     const key = props.valueKey
+    const atomicMethods = useAtomicContextMethods(atomicContext)
     const { contextValue, setters, onChange } = React.useContext(AtomicContext)
     if (!contextValue || !setters) {
       throw new Error(notUnderProviderError)
@@ -71,7 +72,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
       setVal(value)
       contextValue.current[key] = value
       if (onChange && onChange.current) {
-        onChange.current({ key, value, oldValue: valRef.current }, contextValue.current)
+        onChange.current({ key, value, oldValue: valRef.current }, atomicMethods)
       }
     }, [])
 
@@ -126,6 +127,24 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     const settersRef = React.useRef({} as SettersType<T>)
 
     const rootValue = React.useMemo<RootValue<T>>(() => {
+      const getterSetters: Record<string, unknown> = Object.create({
+        get() {
+          console.warn(
+            name +
+              ': The "get" method is only used for development purposes to view the current value of the context.'
+          )
+          return Object.freeze({ ...valueRef.current })
+        },
+      })
+      const _getters = gettersRef.current
+      const _setters = settersRef.current
+      Object.keys(_getters).forEach(k => {
+        getterSetters[`get${k[0].toUpperCase()}${k.slice(1)}`] = _getters[k]
+      })
+      Object.keys(_setters).forEach(k => {
+        getterSetters[`set${k[0].toUpperCase()}${k.slice(1)}`] = _setters[k]
+      })
+      // return Object.freeze(getterSetters) as AtomContextMethodsType<T>
       return {
         getters: gettersRef,
         setters: settersRef,
@@ -136,7 +155,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     return React.createElement(AtomicContext.Provider, { value: rootValue }, provider)
   }
 
-  return {
+  const atomicContext = {
     Provider,
     _contexts: contexts,
     _atomicContext: AtomicContext,
@@ -149,6 +168,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     _currentValue: initValue,
     typeof: '$AtomicContext' as const,
   } satisfies AtomicContextType<T>
+  return atomicContext
 }
 
 /**
