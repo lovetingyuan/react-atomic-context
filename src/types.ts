@@ -1,6 +1,6 @@
 import React from 'react'
 
-type GetSetKey<K, O extends 'get' | 'set'> = K extends `${infer L}${infer R}`
+export type GetSetKey<K, O extends 'get' | 'set'> = K extends `${infer L}${infer R}`
   ? `${O}${Uppercase<L>}${R}`
   : never
 
@@ -59,7 +59,7 @@ export type ProviderOnChangeType<T extends Record<string, unknown>> = (
   changeInfo: {
     [K in keyof T]: { key: K; value: T[K]; oldValue: T[K] }
   }[keyof T],
-  currentValue: T
+  methods: AtomContextMethodsType<T>
 ) => void
 
 export type ContextsType<T extends Record<string, unknown>> = {
@@ -67,10 +67,9 @@ export type ContextsType<T extends Record<string, unknown>> = {
 }
 
 export type RootValue<T extends Record<string, unknown>> = {
-  getters: React.MutableRefObject<GettersType<T>> | null
-  setters: React.MutableRefObject<SettersType<T>> | null
-  contextValue: React.MutableRefObject<T> | null
-  onChange: React.MutableRefObject<ProviderOnChangeType<T> | undefined> | null
+  getterSetters: AtomContextMethodsType<T> | null
+  valueRef: React.MutableRefObject<T> | null
+  onChangeRef: React.MutableRefObject<ProviderOnChangeType<T> | undefined> | null
 }
 
 /**
@@ -90,7 +89,7 @@ export interface AtomicContextType<T extends Record<string, unknown>> {
   displayName?: string
   _atomicContext: React.Context<RootValue<T>>
   _currentValue: T
-  Provider: AtomicProviderType<T>
+  Provider: React.MemoExoticComponent<AtomicProviderType<T>>
   typeof: '$AtomicContext'
 }
 
@@ -99,5 +98,6 @@ export interface AtomicContextType<T extends Record<string, unknown>> {
  * In general, it is sufficient to directly export the type of the initial value
  * and there is no need to use this type.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GetAtomicContextValueType<C extends AtomicContextType<any>> =
   C extends AtomicContextType<infer U> ? U : never

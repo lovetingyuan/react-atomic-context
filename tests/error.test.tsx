@@ -47,7 +47,7 @@ const B = React.memo(function B() {
 
 function App() {
   return (
-    // @ts-expect-error
+    // @ts-expect-error aaa
     <context.Provider>
       <A />
     </context.Provider>
@@ -57,7 +57,7 @@ function App3() {
   return (
     <context.Provider
       value={{
-        // @ts-expect-error
+        // @ts-expect-error aaa
         foo: false,
       }}
     >
@@ -71,7 +71,7 @@ describe('error-cases-test', () => {
     cleanup()
   })
   it('throws-no-provider', t => {
-    t.mock.method(console, 'error', () => { })
+    t.mock.method(console, 'error', () => {})
     render(
       <ErrorBoundary>
         <A />
@@ -84,7 +84,7 @@ describe('error-cases-test', () => {
     assert.ok(error.innerHTML.includes('wrapped by the Provider'))
   })
   it('throws-no-value', t => {
-    t.mock.method(console, 'error', () => { })
+    t.mock.method(console, 'error', () => {})
     render(
       <ErrorBoundary>
         <App />
@@ -95,7 +95,7 @@ describe('error-cases-test', () => {
   })
 
   it('throws-no-exist-property', t => {
-    t.mock.method(console, 'error', () => { })
+    t.mock.method(console, 'error', () => {})
     render(
       <ErrorBoundary>
         <App3 />
@@ -107,7 +107,7 @@ describe('error-cases-test', () => {
   it('throws-no-empty-property', () => {
     assert.throws(
       () => {
-        // @ts-expect-error
+        // @ts-expect-error aaa
         createAtomicContext()
       },
       {

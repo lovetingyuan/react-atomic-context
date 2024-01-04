@@ -76,26 +76,23 @@ describe('onchange-test', () => {
     fireEvent.click(aa)
     assert.strictEqual(onChange.mock.calls.length, 1)
     const call = onChange.mock.calls[0]
-    assert.deepStrictEqual(call.arguments, [{ key: 'a', value: 'aaa1', oldValue: 'aaa' }, {
-      a: 'aaa1', b: 'bbb'
-    }])
+    assert.deepStrictEqual(call.arguments[0], { key: 'a', value: 'aaa1', oldValue: 'aaa' })
+    assert.deepStrictEqual(Object.keys(call.arguments[1]).sort(), ['getA', 'getB', 'setA', 'setB'])
+    assert.deepStrictEqual(call.arguments[1].get(), { a: 'aaa1', b: 'bbb' })
     fireEvent.click(bb)
     assert.strictEqual(onChange.mock.calls.length, 2)
     const call2 = onChange.mock.calls[1]
-    assert.deepStrictEqual(call2.arguments, [{ key: 'b', value: 'bbb10', oldValue: 'bbb' }, {
-      a: 'aaa1', b: 'bbb10'
-    }])
+    assert.deepStrictEqual(call2.arguments[0], { key: 'b', value: 'bbb10', oldValue: 'bbb' })
+    assert.deepStrictEqual(call2.arguments[1].get(), { a: 'aaa1', b: 'bbb10' })
     fireEvent.click(aa)
     assert.strictEqual(onChange.mock.calls.length, 3)
     const call3 = onChange.mock.calls[2]
-    assert.deepStrictEqual(call3.arguments, [{ key: 'a', value: 'aaa2', oldValue: 'aaa1' }, {
-      a: 'aaa2', b: 'bbb10'
-    }])
+    assert.deepStrictEqual(call3.arguments[0], { key: 'a', value: 'aaa2', oldValue: 'aaa1' })
+    assert.deepStrictEqual(call3.arguments[1].get(), { a: 'aaa2', b: 'bbb10' })
     fireEvent.click(bb)
     assert.strictEqual(onChange.mock.calls.length, 4)
     const call4 = onChange.mock.calls[3]
-    assert.deepStrictEqual(call4.arguments, [{ key: 'b', value: 'bbb11', oldValue: 'bbb10' }, {
-      a: 'aaa2', b: 'bbb11'
-    }])
+    assert.deepStrictEqual(call4.arguments[0], { key: 'b', value: 'bbb11', oldValue: 'bbb10' })
+    assert.deepStrictEqual(call4.arguments[1].get(), { a: 'aaa2', b: 'bbb11' })
   })
 })

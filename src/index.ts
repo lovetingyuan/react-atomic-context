@@ -4,23 +4,32 @@
  * and meantime won't trigger a full re-rendering.
  */
 import React from 'react'
+import { name } from '../package.json'
 import type {
+  AtomContextMethodsType,
   AtomContextValueType,
-  AtomicContextType,
-  ContextsType,
-  GettersType,
-  RootValue,
-  SettersType,
   AtomicContextGettersType,
   AtomicContextSettersType,
-  ProviderOnChangeType,
+  AtomicContextType,
   AtomicProviderType,
-  AtomContextMethodsType,
+  ContextsType,
+  ProviderOnChangeType,
+  RootValue,
 } from './types.ts'
-import { name } from '../package.json'
 
-const notUnderProviderError =
+const NotUnderProviderError =
   name + ': components using useAtomicContext must be wrapped by the Provider.'
+
+// https://github.com/Andarist/use-constant
+export default function useConstant<T>(fn: () => T): T {
+  const ref = React.useRef<{ v: T }>()
+
+  if (!ref.current) {
+    ref.current = { v: fn() }
+  }
+
+  return ref.current.v
+}
 
 /**
  * create a new atomic context.
@@ -49,10 +58,9 @@ export function createAtomicContext<T extends Record<string, unknown>>(
   Object.freeze(contexts)
 
   const AtomicContext = React.createContext<RootValue<T>>({
-    getters: null,
-    setters: null,
-    contextValue: null,
-    onChange: null,
+    getterSetters: null,
+    valueRef: null,
+    onChangeRef: null,
   })
   AtomicContext.displayName = 'AtomicContext'
 
@@ -60,25 +68,28 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     props: React.PropsWithChildren<{ valueKey: keyof T }>
   ) {
     const key = props.valueKey
-    const { contextValue, setters, onChange } = React.useContext(AtomicContext)
-    if (!contextValue || !setters) {
-      throw new Error(notUnderProviderError)
+    const { valueRef, onChangeRef, getterSetters } = React.useContext(AtomicContext)
+    if (!valueRef?.current || !getterSetters) {
+      throw new Error(NotUnderProviderError)
     }
-    const [val, setVal] = React.useState(contextValue.current[key])
+    const [val, setVal] = React.useState(valueRef.current[key])
     const valRef = React.useRef(val)
     valRef.current = val
-    setters.current[key] = React.useCallback(value => {
+    const k = key as string
+    const setKey = `set${k[0].toUpperCase()}${k.slice(1)}`
+    // @ts-expect-error good to runtime
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    getterSetters[setKey] = React.useCallback((value: any) => {
       setVal(value)
-      contextValue.current[key] = value
-      if (onChange && onChange.current) {
-        onChange.current({ key, value, oldValue: valRef.current }, contextValue.current)
-      }
+      valueRef.current[key] = value
+      onChangeRef?.current?.({ key, value, oldValue: valRef.current }, getterSetters)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return React.createElement(contexts[key].Provider, { value: val }, props.children)
   })
 
-  const Provider: AtomicProviderType<T> = props => {
+  const Provider = React.memo<AtomicProviderType<T>>(function Provider(props) {
     const initValueRef = React.useRef(props.value)
     if (initValueRef.current !== props.value) {
       console.warn(name + ': "value" passed to Provider can not be changed, please use useMemo.')
@@ -89,7 +100,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     if ('onChange' in props && typeof props.onChange !== 'function') {
       throw new Error(name + ': "onChange" prop of Provider must be a function.')
     }
-    const keys = Object.keys(initValueRef.current) as (keyof T)[]
+    const keysRef = React.useRef<(keyof T)[]>(Object.keys(initValueRef.current))
     const valueRef = React.useRef<T>(initValueRef.current)
     if (valueRef.current === initValueRef.current) {
       valueRef.current = Object.seal({ ...initValueRef.current })
@@ -99,20 +110,14 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     onChangeRef.current = props.onChange
 
     let provider = props.children
-    const gettersRef = React.useRef({} as GettersType<T>)
 
-    for (const key of keys) {
+    for (const key of keysRef.current) {
       if (!(key in contexts)) {
         throw new Error(
           `${name}: property "${String(
             key
           )}" does not exist in the initial value passed to createAtomicContext.`
         )
-      }
-      if (!(key in gettersRef.current)) {
-        gettersRef.current[key] = () => {
-          return valueRef.current[key]
-        }
       }
       provider = React.createElement(
         AtomProviderWrapper,
@@ -122,19 +127,30 @@ export function createAtomicContext<T extends Record<string, unknown>>(
         provider
       )
     }
-
-    const settersRef = React.useRef({} as SettersType<T>)
-
-    const rootValue = React.useMemo<RootValue<T>>(() => {
+    const rootValue = useConstant<RootValue<T>>(() => {
+      const getterSetters: AtomContextMethodsType<T> = Object.create({
+        get() {
+          console.warn(
+            name +
+              ': The "get" method is only used for development purposes to view the current value of the context.'
+          )
+          return Object.freeze({ ...valueRef.current })
+        },
+      })
+      for (const key of keysRef.current) {
+        const k = key as string
+        const getKey = `get${k[0].toUpperCase()}${k.slice(1)}`
+        // @ts-expect-error good to runtime
+        getterSetters[getKey] = () => valueRef.current[key]
+      }
       return {
-        getters: gettersRef,
-        setters: settersRef,
-        contextValue: valueRef,
-        onChange: onChangeRef,
+        getterSetters,
+        valueRef,
+        onChangeRef,
       } satisfies RootValue<T>
-    }, [])
+    })
     return React.createElement(AtomicContext.Provider, { value: rootValue }, provider)
-  }
+  })
 
   return {
     Provider,
@@ -160,7 +176,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
 export function useAtomicContext<T extends Record<string, unknown>>(context: AtomicContextType<T>) {
   const methods = useAtomicContextMethods(context)
   const { _contexts } = context
-  return React.useMemo(() => {
+  return useConstant(() => {
     const obj = Object.create(methods) as AtomContextValueType<T>
     Object.keys(_contexts).forEach(key => {
       Object.defineProperty(obj, key, {
@@ -171,7 +187,7 @@ export function useAtomicContext<T extends Record<string, unknown>>(context: Ato
       })
     })
     return Object.freeze(obj)
-  }, [])
+  })
 }
 
 /**
@@ -182,31 +198,12 @@ export function useAtomicContext<T extends Record<string, unknown>>(context: Ato
  */
 export function useAtomicContextMethods<T extends Record<string, unknown>>(
   context: AtomicContextType<T>
-): AtomContextMethodsType<T> {
-  const { getters, setters, contextValue } = React.useContext(context._atomicContext)
-  if (!setters || !getters || !contextValue) {
-    throw new Error(notUnderProviderError)
+) {
+  const { getterSetters } = React.useContext(context._atomicContext)
+  if (!getterSetters) {
+    throw new Error(NotUnderProviderError)
   }
-  return React.useMemo(() => {
-    const getterSetters: Record<string, unknown> = Object.create({
-      get() {
-        console.warn(
-          name +
-            ': The "get" method is only used for development purposes to view the current value of the context.'
-        )
-        return Object.freeze({ ...contextValue.current })
-      },
-    })
-    const _getters = getters.current
-    const _setters = setters.current
-    Object.keys(_getters).forEach(k => {
-      getterSetters[`get${k[0].toUpperCase()}${k.slice(1)}`] = _getters[k]
-    })
-    Object.keys(_setters).forEach(k => {
-      getterSetters[`set${k[0].toUpperCase()}${k.slice(1)}`] = _setters[k]
-    })
-    return Object.freeze(getterSetters) as AtomContextMethodsType<T>
-  }, [])
+  return getterSetters
 }
 
 export type { AtomicContextGettersType, AtomicContextSettersType, ProviderOnChangeType }

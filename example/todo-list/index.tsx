@@ -1,6 +1,6 @@
-import React from "react";
-import { Status, TodoListValueType, TodoProvider } from "./context.ts";
-import Header from "./header.tsx";
+import React from 'react'
+import { Status, TodoListValueType, TodoProvider } from './context.ts'
+import Header from './header.tsx'
 import TodoList from './list.tsx'
 
 export default function TodoListApp() {
@@ -13,7 +13,12 @@ export default function TodoListApp() {
     } satisfies TodoListValueType
   }, [])
   return (
-    <TodoProvider value={value}>
+    <TodoProvider
+      value={value}
+      onChange={(e, b) => {
+        console.log(e, b)
+      }}
+    >
       <Header />
       <TodoList />
     </TodoProvider>
