@@ -21,7 +21,7 @@ const NotUnderProviderError =
   name + ': components using useAtomicContext must be wrapped by the Provider.'
 
 // https://github.com/Andarist/use-constant
-export default function useConstant<T>(fn: () => T): T {
+function useConstant<T>(fn: () => T): T {
   const ref = React.useRef<{ v: T }>()
 
   if (!ref.current) {
@@ -92,19 +92,18 @@ export function createAtomicContext<T extends Record<string, unknown>>(
   const Provider = React.memo<AtomicProviderType<T>>(function Provider(props) {
     const initValueRef = React.useRef(props.value)
     if (initValueRef.current !== props.value) {
-      console.warn(name + ': "value" passed to Provider can not be changed, please use useMemo.')
+      console.warn(
+        name + ': "value" passed to <Provider> can not be changed, please use "useMemo".'
+      )
     }
     if (Object.prototype.toString.call(props.value) !== '[object Object]') {
-      throw new Error(name + ': "value" prop of Provider is required and must be object.')
+      throw new Error(name + ': "value" prop of <Provider> is required and must be object.')
     }
     if ('onChange' in props && typeof props.onChange !== 'function') {
-      throw new Error(name + ': "onChange" prop of Provider must be a function.')
+      throw new Error(name + ': "onChange" prop of <Provider> must be a function.')
     }
     const keysRef = React.useRef<(keyof T)[]>(Object.keys(initValueRef.current))
-    const valueRef = React.useRef<T>(initValueRef.current)
-    if (valueRef.current === initValueRef.current) {
-      valueRef.current = Object.seal({ ...initValueRef.current })
-    }
+    const valueRef = React.useRef<T>(Object.seal({ ...initValueRef.current }))
 
     const onChangeRef = React.useRef(props.onChange)
     onChangeRef.current = props.onChange
@@ -132,7 +131,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
         get() {
           console.warn(
             name +
-              ': The "get" method is only used for development purposes to view the current value of the context.'
+              ': The "get()" method is only used for development purposes to inspect the current value of the context.'
           )
           return Object.freeze({ ...valueRef.current })
         },

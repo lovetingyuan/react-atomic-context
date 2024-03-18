@@ -156,9 +156,9 @@ Overall, the usage of `react-atomic-context` is similar to regular React context
           bar: 'barrr',
         }
       }, [])
-      const handleChange = React.useCallback(({ key, value, oldValue }, currentValue) => {
+      const handleChange = React.useCallback(({ key, value, oldValue }, methods) => {
         console.log(`${key} changed from ${oldValue} to ${value}`)
-        console.log('the current value of context is', currentValue)
+        console.log('getters and setters', methods)
       }, [])
       return (
         <AppContext.Provider value={initValue} onChange={handleChange}>
@@ -299,10 +299,14 @@ type Setters = AtomicContextSettersType<typeof initValue, 'foo' | 'baz'>
  *   | { key: 'foo', value: string, oldValue: string }
  *   | { key: 'bar', value: number, oldValue: number }
  *   | { key: 'baz', value: boolean, oldValue: boolean }
- *  currentValue: {
- *    foo: string,
- *    bar: number,
- *    baz: boolean
+ *  methods: {
+ *    getFoo: () => string,
+ *    setFoo: (v: string) => void,
+ *    getBar: () => number,
+ *    setBar: (v: number) => void,
+ *    getBaz: () => boolean,
+ *    setBaz: (v: boolean) => void,
+ *    get: () => { foo: string; bar: number; baz: boolean }
  *  }
  * ) => void
  */
@@ -329,6 +333,5 @@ type OnChange = ProviderOnChangeType<typeof initValue>
 
    Important point but easy to ignore is that **do not forget to use `React.memo` to wrap your component**.
    By the way, There are a fews reasons leading to react component rerender. Such as calling setState, using normal react context, changing the key of the component, etc.
-   
 
 Thank you very much and hope to raise any questions.
