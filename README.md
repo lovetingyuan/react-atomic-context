@@ -251,9 +251,9 @@ Overall, the usage of `react-atomic-context` is similar to regular React context
 
 ```typescript
 import type {
-  AtomContextValueType,
   AtomicContextGettersType,
   AtomicContextSettersType,
+  AtomicContextMethodsType,
   ProviderOnChangeType,
 } from 'react-atomic-context'
 
@@ -290,6 +290,18 @@ type Setters = AtomicContextSettersType<typeof initValue>
  * }
  */
 type Setters = AtomicContextSettersType<typeof initValue, 'foo' | 'baz'>
+
+/**
+ * Methods = {
+ *  setFoo: (newValue: string) => void
+ *  setBar: (newValue: number) => void
+ *  setBaz: (newValue: boolean) => void
+ *  getFoo: () => string
+ *  getBar: () => number
+ *  getBaz: () => boolean
+ * }
+ */
+type Methods = AtomicContextMethodsType<typeof initValue>
 
 /**
  * type of "onChange" callback type passed to Provider.

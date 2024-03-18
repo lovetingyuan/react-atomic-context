@@ -6,8 +6,8 @@
 import React from 'react'
 import { name } from '../package.json'
 import type {
-  AtomContextMethodsType,
-  AtomContextValueType,
+  AtomicContextMethodsType,
+  AtomicContextValueType,
   AtomicContextGettersType,
   AtomicContextSettersType,
   AtomicContextType,
@@ -127,7 +127,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
       )
     }
     const rootValue = useConstant<RootValue<T>>(() => {
-      const getterSetters: AtomContextMethodsType<T> = Object.create({
+      const getterSetters: AtomicContextMethodsType<T> = Object.create({
         get() {
           console.warn(
             name +
@@ -176,7 +176,7 @@ export function useAtomicContext<T extends Record<string, unknown>>(context: Ato
   const methods = useAtomicContextMethods(context)
   const { _contexts } = context
   return useConstant(() => {
-    const obj = Object.create(methods) as AtomContextValueType<T>
+    const obj = Object.create(methods) as AtomicContextValueType<T>
     Object.keys(_contexts).forEach(key => {
       Object.defineProperty(obj, key, {
         get() {
@@ -208,6 +208,6 @@ export function useAtomicContextMethods<T extends Record<string, unknown>>(
 export type {
   AtomicContextGettersType,
   AtomicContextSettersType,
+  AtomicContextMethodsType,
   ProviderOnChangeType,
-  AtomContextMethodsType,
 }

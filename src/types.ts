@@ -32,7 +32,7 @@ export type AtomicContextSettersType<
   [k in K as GetSetKey<k, 'set'>]: (newValue: T[k]) => void
 }
 
-export type AtomContextMethodsType<
+export type AtomicContextMethodsType<
   T extends Record<string, unknown>,
   K extends keyof T = keyof T
 > = Omit<
@@ -47,8 +47,8 @@ export type AtomContextMethodsType<
 /**
  * type of atomic context value(return type of `useAtomicContext`)
  */
-export type AtomContextValueType<T extends Record<string, unknown>> = Omit<
-  T & AtomContextMethodsType<T>,
+export type AtomicContextValueType<T extends Record<string, unknown>> = Omit<
+  T & AtomicContextMethodsType<T>,
   ''
 >
 
@@ -59,7 +59,7 @@ export type ProviderOnChangeType<T extends Record<string, unknown>> = (
   changeInfo: {
     [K in keyof T]: { key: K; value: T[K]; oldValue: T[K] }
   }[keyof T],
-  methods: AtomContextMethodsType<T>
+  methods: AtomicContextMethodsType<T>
 ) => void
 
 export type ContextsType<T extends Record<string, unknown>> = {
@@ -67,7 +67,7 @@ export type ContextsType<T extends Record<string, unknown>> = {
 }
 
 export type RootValue<T extends Record<string, unknown>> = {
-  getterSetters: AtomContextMethodsType<T> | null
+  getterSetters: AtomicContextMethodsType<T> | null
   valueRef: React.MutableRefObject<T> | null
   onChangeRef: React.MutableRefObject<ProviderOnChangeType<T> | undefined> | null
 }
