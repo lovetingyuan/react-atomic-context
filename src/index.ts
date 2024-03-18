@@ -206,4 +206,9 @@ export function useAtomicContextMethods<T extends Record<string, unknown>>(
   return getterSetters
 }
 
-export type { AtomicContextGettersType, AtomicContextSettersType, ProviderOnChangeType }
+export type {
+  AtomicContextGettersType,
+  AtomicContextSettersType,
+  ProviderOnChangeType,
+  AtomContextMethodsType,
+}
