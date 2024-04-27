@@ -1,18 +1,10 @@
 import React from 'react'
-import { Status, useTodoContext } from './context.ts'
 import TodoItem from './item.tsx'
-import Siv from '../Siv.tsx'
+import Siv from '../../Siv.tsx'
+import { useDisplayList } from '../derives.ts'
 
 const TodoList = React.memo(function TodoList() {
-  const { todoList, status } = useTodoContext()
-  const displayList = React.useMemo(() => {
-    if (status === Status.all) {
-      return todoList
-    }
-    return todoList.filter(item => {
-      return item.status === status
-    })
-  }, [todoList, status])
+  const displayList = useDisplayList()
   return (
     <Siv title="list">
       {displayList.length ? (

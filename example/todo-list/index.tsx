@@ -1,7 +1,7 @@
 import React from 'react'
 import { Status, TodoListValueType, TodoProvider } from './context.ts'
-import Header from './header.tsx'
-import TodoList from './list.tsx'
+import Header from './components/header.tsx'
+import TodoList from './components/list.tsx'
 
 export default function TodoListApp() {
   const value = React.useMemo(() => {
@@ -15,8 +15,13 @@ export default function TodoListApp() {
   return (
     <TodoProvider
       value={value}
-      onChange={(e, b) => {
-        console.log(e, b)
+      onChange={({ key, value, oldValue }, b) => {
+        if (key === 'todoList') {
+          if (value.length > 10) {
+            alert('最多添加10条')
+            b.setTodoList(oldValue)
+          }
+        }
       }}
     >
       <Header />

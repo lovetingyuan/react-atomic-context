@@ -1,7 +1,7 @@
 import React from 'react'
-import { Status, useTodoContext } from './context.ts'
-import Siv from '../Siv.tsx'
-import { useAddTodoItem } from './actions.ts'
+import { Status, useTodoContext } from '../context.ts'
+import Siv from '../../Siv.tsx'
+import { useAddTodoItem } from '../actions.ts'
 
 const Header = React.memo(function Header() {
   const { setStatus, getStatus } = useTodoContext()
@@ -12,7 +12,7 @@ const Header = React.memo(function Header() {
         onSubmit={e => {
           e.preventDefault()
           const input = (e.target as any).elements.input
-          const value = input.value.trim()
+          const value: string = input.value.trim()
           if (value) {
             addTodoItem(value)
           }

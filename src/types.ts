@@ -88,7 +88,7 @@ export interface AtomicContextType<T extends Record<string, unknown>> {
   _contexts: ContextsType<T>
   displayName?: string
   _atomicContext: React.Context<RootValue<T>>
-  _currentValue: T
+  // _currentValue: T
   Provider: React.MemoExoticComponent<AtomicProviderType<T>>
   typeof: '$AtomicContext'
 }

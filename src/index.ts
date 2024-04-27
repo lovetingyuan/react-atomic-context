@@ -40,7 +40,7 @@ function useConstant<T>(fn: () => T): T {
 export function createAtomicContext<T extends Record<string, unknown>>(
   initValue: T
 ): AtomicContextType<T> {
-  Object.seal(initValue)
+  // Object.seal(initValue)
   const contexts = Object.create(null) as ContextsType<T>
   if (Object.prototype.toString.call(initValue) !== '[object Object]') {
     throw new Error(
@@ -55,7 +55,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
       contexts[key].displayName = key + 'Context'
     }
   }
-  Object.freeze(contexts)
+  // Object.freeze(contexts)
 
   const AtomicContext = React.createContext<RootValue<T>>({
     getterSetters: null,
@@ -76,7 +76,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     const valRef = React.useRef(val)
     valRef.current = val
     const k = key as string
-    const setKey = `set${k[0].toUpperCase()}${k.slice(1)}`
+    const setKey = `set${k[0].toUpperCase()}${k.slice(1)}` as const
     // @ts-expect-error good to runtime
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getterSetters[setKey] = React.useCallback((value: any) => {
@@ -91,19 +91,22 @@ export function createAtomicContext<T extends Record<string, unknown>>(
 
   const Provider = React.memo<AtomicProviderType<T>>(function Provider(props) {
     const initValueRef = React.useRef(props.value)
-    if (initValueRef.current !== props.value) {
-      console.warn(
-        name + ': "value" passed to <Provider> can not be changed, please use "useMemo".'
-      )
-    }
+    // if (initValueRef.current !== props.value) {
+    //   console.warn(
+    //     name + ': "value" passed to <Provider> can not be changed, please use "useMemo".'
+    //   )
+    // }
     if (Object.prototype.toString.call(props.value) !== '[object Object]') {
       throw new Error(name + ': "value" prop of <Provider> is required and must be object.')
     }
     if ('onChange' in props && typeof props.onChange !== 'function') {
       throw new Error(name + ': "onChange" prop of <Provider> must be a function.')
     }
-    const keysRef = React.useRef<(keyof T)[]>(Object.keys(initValueRef.current))
-    const valueRef = React.useRef<T>(Object.seal({ ...initValueRef.current }))
+    const keysRef = React.useRef<(keyof T)[]>([])
+    if (!keysRef.current.length) {
+      keysRef.current = Object.keys(initValueRef.current)
+    }
+    const valueRef = React.useRef<T>(initValueRef.current)
 
     const onChangeRef = React.useRef(props.onChange)
     onChangeRef.current = props.onChange
@@ -131,7 +134,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
         get() {
           console.warn(
             name +
-              ': The "get()" method is only used for development purposes to inspect the current value of the context.'
+              ': The "get()" method is only used for development to inspect the current context value.'
           )
           return Object.freeze({ ...valueRef.current })
         },
@@ -161,7 +164,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     set displayName(n) {
       AtomicContext.displayName = n
     },
-    _currentValue: initValue,
+    // _currentValue: initValue,
     typeof: '$AtomicContext' as const,
   } satisfies AtomicContextType<T>
 }
