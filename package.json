@@ -1,12 +1,10 @@
 {
   "name": "react-atomic-context",
   "version": "2.0.3",
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "description": "Optimized React context",
   "types": "./dist/index.d.ts",
-  "unpkg": "./dist/index.umd.js",
-  "jsdelivr": "./dist/index.umd.js",
   "files": [
     "dist"
   ],
@@ -17,8 +15,8 @@
         "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
       },
       "default": {
         "types": "./dist/index.d.mts",
@@ -41,6 +39,7 @@
   "scripts": {
     "test": "tsc --noEmit -p tests/tsconfig.json && tsx tests/index.ts",
     "build": "unbuild",
+    "build:tsup": "npx tsup src/index.ts  --format esm,cjs --dts --clean",
     "dev": "live-server ./",
     "prepublishOnly": "npm run lint && npm run build && npm test",
     "pub": "npx np",
@@ -65,15 +64,16 @@
     "@types/node": "^20.10.4",
     "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
-    "global-jsdom": "9.2.0",
-    "jsdom": "23.0.1",
-    "tsx": "^4.7.0",
-    "unbuild": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
     "eslint": "^8.55.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "typescript": "^5.2.2"
+    "global-jsdom": "9.2.0",
+    "jsdom": "23.0.1",
+    "tsup": "^8.1.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.2.2",
+    "unbuild": "^2.0.0"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
