@@ -1,7 +1,7 @@
 {
   "name": "react-atomic-context",
   "version": "2.1.1-0",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "description": "Optimized React context",
   "types": "./dist/index.d.ts",
@@ -15,8 +15,8 @@
         "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
       },
       "default": {
         "types": "./dist/index.d.mts",
