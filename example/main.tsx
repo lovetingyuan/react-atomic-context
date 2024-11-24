@@ -17,8 +17,8 @@ function App() {
     })
   }, [app])
   return (
-    <div>
-      <h3>react-atomic-context examples:</h3>
+    <div className="container">
+      <h3 style={{ marginTop: 20 }}>react-atomic-context examples:</h3>
       <ul>
         <li>
           <a href="./?app=base">base</a>

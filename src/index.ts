@@ -37,7 +37,7 @@ function useConstant<T>(fn: () => T): T {
  * @param initValue initial value for creating a new atomic context, required.
  * @returns a new atomic context
  */
-export function createAtomicContext<T extends Record<string, unknown>>(
+function createAtomicContext<T extends Record<string, unknown>>(
   initValue: T
 ): AtomicContextType<T> {
   const contexts = Object.create(null) as ContextsType<T>
@@ -78,7 +78,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
     // @ts-expect-error good to runtime
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getterSetters[setKey] = React.useCallback((value: any) => {
-      setVal(typeof value === 'function' ? () => value : value)
+      setVal(value)
       valueRef.current[key] = value
       onChangeRef?.current?.({ key, value, oldValue: valRef.current }, getterSetters)
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -144,16 +144,6 @@ export function createAtomicContext<T extends Record<string, unknown>>(
         onChangeRef,
       } satisfies RootValue<T>
     })
-    const values = Object.values(props.value)
-    React.useEffect(() => {
-      for (let i = 0; i < keysRef.current.length; i++) {
-        const k = keysRef.current[i]
-        const key = `set${k.toString().replace(/^[a-z]/, c => c.toUpperCase())}`
-        // @ts-expect-error inside effect, set-method has been mounted
-        rootValue.getterSetters[key](values[i])
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, values)
     return React.createElement(AtomicContext.Provider, { value: rootValue }, provider)
   })
 
@@ -178,7 +168,7 @@ export function createAtomicContext<T extends Record<string, unknown>>(
  * @param param atomic context created by `createAtomicContext`
  * @returns context value with getters and setters of each property.
  */
-export function useAtomicContext<T extends Record<string, unknown>>(context: AtomicContextType<T>) {
+function useAtomicContext<T extends Record<string, unknown>>(context: AtomicContextType<T>) {
   const methods = useAtomicContextMethods(context)
   const { _contexts } = context
   return useConstant(() => {
@@ -201,9 +191,7 @@ export function useAtomicContext<T extends Record<string, unknown>>(context: Ato
  * @param param atomic context created by `createAtomicContext`
  * @returns getters and setters methods of each property.
  */
-export function useAtomicContextMethods<T extends Record<string, unknown>>(
-  context: AtomicContextType<T>
-) {
+function useAtomicContextMethods<T extends Record<string, unknown>>(context: AtomicContextType<T>) {
   const { getterSetters } = React.useContext(context._atomicContext)
   if (!getterSetters) {
     throw new Error(NotUnderProviderError)
@@ -211,35 +199,7 @@ export function useAtomicContextMethods<T extends Record<string, unknown>>(
   return getterSetters
 }
 
-const hasOwn = ('hasOwn' in Object ? Object.hasOwn : Object.call.bind(Object.hasOwnProperty)) as (
-  o: object,
-  v: PropertyKey
-) => boolean
-
-/**
- * react hook to return context value, support sync with extra data(eg. component props)
- * @param initValue initial value of context provider(or a function return it)
- * @param props keep extra data (eg: component props) sync to value(except "children")
- * @returns context value
- */
-export function useAtomicContextValue<T extends Record<string, unknown>>(
-  initValue: T | (() => T),
-  props?: Record<string, unknown>
-) {
-  const value = React.useMemo(() => {
-    return typeof initValue === 'function' ? initValue() : initValue
-  }, [initValue])
-  if (props && typeof props === 'object') {
-    const propKeys = Object.keys(props)
-    for (const key of propKeys) {
-      if (hasOwn(value, key) && key !== 'children' && !key.includes('-')) {
-        // @ts-expect-error safe
-        value[key] = props[key]
-      }
-    }
-  }
-  return value
-}
+export { createAtomicContext, useAtomicContext, useAtomicContextMethods }
 
 export type {
   AtomicContextGettersType,

@@ -3,7 +3,7 @@ import { Status, useTodoContext } from './context.ts'
 
 export function useDisplayList() {
   const { todoList, status } = useTodoContext()
-  const displayList = React.useMemo(() => {
+  return React.useMemo(() => {
     if (status === Status.all) {
       return todoList
     }
@@ -11,5 +11,4 @@ export function useDisplayList() {
       return item.status === status
     })
   }, [todoList, status])
-  return displayList
 }

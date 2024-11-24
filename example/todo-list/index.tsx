@@ -1,17 +1,9 @@
-import React from 'react'
-import { Status, TodoListValueType, TodoProvider } from './context.ts'
+import { TodoProvider, useTodoValue } from './context.ts'
 import Header from './components/header.tsx'
 import TodoList from './components/list.tsx'
 
 export default function TodoListApp() {
-  const value = React.useMemo(() => {
-    return {
-      route: 'todo-list' as 'todo-list' | 'about',
-      todoList: [],
-      status: Status.all,
-      editingId: '',
-    } satisfies TodoListValueType
-  }, [])
+  const value = useTodoValue()
   return (
     <TodoProvider
       value={value}

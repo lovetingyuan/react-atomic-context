@@ -4,13 +4,13 @@ export type GetSetKey<K, O extends 'get' | 'set'> = K extends `${infer L}${infer
   ? `${O}${Uppercase<L>}${R}`
   : never
 
-export type GettersType<T extends Record<string, unknown>> = {
-  [k in keyof T]: () => T[k]
-}
+// export type GettersType<T extends Record<string, unknown>> = {
+//   [k in keyof T]: () => T[k]
+// }
 
-export type SettersType<T extends Record<string, unknown>> = {
-  [k in keyof T]: (v: T[k]) => void
-}
+// export type SettersType<T extends Record<string, unknown>> = {
+//   [k in keyof T]: (v: T[k]) => void
+// }
 
 /**
  * type of getters object according the context value.
@@ -22,6 +22,10 @@ export type AtomicContextGettersType<
   [k in K as GetSetKey<k, 'get'>]: () => T[k]
 }
 
+// type Foo<T> = T extends (...v: infer A) => infer R
+//   ? (o: (...v: A) => R) => (...v: A) => R
+//   : T | ((v: T) => T)
+
 /**
  * type of setters object according the context value.
  */
@@ -29,7 +33,11 @@ export type AtomicContextSettersType<
   T extends Record<string, unknown>,
   K extends keyof T = keyof T
 > = {
-  [k in K as GetSetKey<k, 'set'>]: (newValue: T[k]) => void
+  [k in K as GetSetKey<k, 'set'>]: (
+    newValue: T[k] extends (...v: infer A) => infer R
+      ? (o: (...v: A) => R) => (...v: A) => R
+      : T[k] | ((v: T[k]) => T[k])
+  ) => void
 }
 
 export type AtomicContextMethodsType<

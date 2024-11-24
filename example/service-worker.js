@@ -61,6 +61,9 @@ const fileExts = ['tsx', 'ts', 'css', 'json']
 
 self.addEventListener('fetch', event => {
   const url = event.request.url
+  if (url.startsWith('https://')) {
+    return
+  }
   if (fileExts.some(v => url.endsWith('.' + v))) {
     event.respondWith(
       fetch(event.request)

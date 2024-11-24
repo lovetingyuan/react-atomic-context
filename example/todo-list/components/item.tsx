@@ -5,7 +5,8 @@ import { useChangeStatus, useDeleteItem, useUpdateTitle } from '../actions.ts'
 
 const TodoItem = React.memo(function TodoItem(props: { item: TodoItemType }) {
   const { title, id, status } = props.item
-  const { setEditingId, editingId } = useTodoContext()
+
+  const { setEditingId, editingId, testFunc, setTestFunc } = useTodoContext()
   const editing = editingId === id
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const changeStatus = useChangeStatus()
@@ -58,6 +59,7 @@ const TodoItem = React.memo(function TodoItem(props: { item: TodoItemType }) {
         >
           ❌
         </span>
+        <span onClick={testFunc}>sdasdasd</span>
       </p>
     </Siv>
   )
