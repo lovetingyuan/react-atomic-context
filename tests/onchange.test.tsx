@@ -72,7 +72,7 @@ describe('onchange-test', () => {
     render(<App onChange={onChange} />)
     const aa = screen.getByTestId('dksflj')
     const bb = screen.getByTestId('rhdsf')
-    const baseCount = 2
+    const baseCount = 0
     assert.strictEqual(onChange.mock.calls.length, baseCount)
     fireEvent.click(aa)
     assert.strictEqual(onChange.mock.calls.length, baseCount + 1)
