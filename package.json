@@ -1,6 +1,6 @@
 {
   "name": "react-atomic-context",
-  "version": "2.1.1-2",
+  "version": "2.1.0-2",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "description": "Optimized React context",
