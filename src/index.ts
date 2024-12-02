@@ -78,9 +78,19 @@ function createAtomicContext<T extends Record<string, unknown>>(
     // @ts-expect-error good to runtime
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getterSetters[setKey] = React.useCallback((value: any) => {
-      setVal(value)
-      valueRef.current[key] = value
-      onChangeRef?.current?.({ key, value, oldValue: valRef.current }, getterSetters)
+      setVal(v => {
+        if (typeof value === 'function') {
+          const result = value(v)
+          valueRef.current[key] = result
+          return result
+        }
+        valueRef.current[key] = value
+        return value
+      })
+      onChangeRef?.current?.(
+        { key, value: valueRef.current[key], oldValue: valRef.current },
+        getterSetters
+      )
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 

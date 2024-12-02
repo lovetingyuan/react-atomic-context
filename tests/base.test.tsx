@@ -7,35 +7,62 @@ import { createAtomicContext, useAtomicContext } from 'react-atomic-context'
 
 const context = createAtomicContext({
   aaa: 'aaa',
-  bbb: 'bbb'
+  bbb: 'bbb',
+  ccc: () => 'c' as string,
 })
 
 const A = React.memo(function A() {
-  const { aaa, setAaa } = useAtomicContext(context);
+  const { aaa, setAaa, ccc, setCcc, getCcc, get } = useAtomicContext(context)
   const updateCount = React.useRef(1).current++
-  return <div>
-    <p data-testid="aaaa" onClick={() => {
-      setAaa(aaa.toUpperCase() + updateCount)
-    }}>{aaa}</p>
-    <B />
-  </div>
+  assert.equal(getCcc(), get()['ccc'])
+  return (
+    <div>
+      <p
+        data-testid="aaaa"
+        onClick={() => {
+          setAaa(aaa.toUpperCase() + updateCount)
+        }}
+      >
+        {aaa}
+      </p>
+      <p
+        data-testid="cccc"
+        onClick={() => {
+          setCcc(() => {
+            return () => 'ccccccc'
+          })
+        }}
+      >
+        {ccc.toString()}
+      </p>
+      <B />
+    </div>
+  )
 })
 
 const B = React.memo(function B() {
-  const { bbb, setBbb } = useAtomicContext(context);
+  const { bbb, setBbb } = useAtomicContext(context)
   const updateCount = React.useRef(10).current++
-  return <div>
-    <p data-testid="bbbb" onClick={() => {
-      setBbb('bbb' + updateCount)
-    }}>{bbb}</p>
-  </div>
+  return (
+    <div>
+      <p
+        data-testid="bbbb"
+        onClick={() => {
+          setBbb('bbb' + updateCount)
+        }}
+      >
+        {bbb}
+      </p>
+    </div>
+  )
 })
 
 function App() {
   const initValue = React.useMemo(() => {
     return {
       aaa: 'aaa',
-      bbb: 'bibibi'
+      bbb: 'bibibi',
+      ccc: () => 'cc',
     }
   }, [])
   return (
@@ -57,13 +84,18 @@ describe('test-foo', () => {
     assert.equal(p.textContent, 'AAA1')
     fireEvent.click(p)
     assert.equal(p.textContent, 'AAA12')
-    const pp = screen.getByTestId('bbbb');
+    const pp = screen.getByTestId('bbbb')
     assert.ok(pp.textContent?.includes('bibibi'))
     fireEvent.click(pp)
     assert.equal(pp.textContent, 'bbb10')
     fireEvent.click(pp)
     assert.equal(pp.textContent, 'bbb11')
     assert.equal(p.textContent, 'AAA12')
+
+    const c = screen.getByTestId('cccc')
+    assert.equal(c.textContent, '()=>"cc"')
+    fireEvent.click(c)
+    assert.equal(c.textContent, '()=>"ccccccc"')
   })
   // not concurrent mode
   it('foo-test', () => {
@@ -78,7 +110,7 @@ describe('test-foo', () => {
     assert.equal(p.textContent, 'AAA1')
     fireEvent.click(p)
     assert.equal(p.textContent, 'AAA12')
-    const pp = screen.getByTestId('bbbb');
+    const pp = screen.getByTestId('bbbb')
     assert.ok(pp.textContent?.includes('bibibi'))
     fireEvent.click(pp)
     assert.equal(pp.textContent, 'bbb10')

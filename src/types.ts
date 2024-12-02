@@ -22,10 +22,6 @@ export type AtomicContextGettersType<
   [k in K as GetSetKey<k, 'get'>]: () => T[k]
 }
 
-// type Foo<T> = T extends (...v: infer A) => infer R
-//   ? (o: (...v: A) => R) => (...v: A) => R
-//   : T | ((v: T) => T)
-
 /**
  * type of setters object according the context value.
  */

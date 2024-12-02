@@ -6,12 +6,13 @@ import { useChangeStatus, useDeleteItem, useUpdateTitle } from '../actions.ts'
 const TodoItem = React.memo(function TodoItem(props: { item: TodoItemType }) {
   const { title, id, status } = props.item
 
-  const { setEditingId, editingId, testFunc, setTestFunc } = useTodoContext()
+  const { setEditingId, editingId, testFunc, setTestFunc, getTestFunc, get } = useTodoContext()
   const editing = editingId === id
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const changeStatus = useChangeStatus()
   const deleteItem = useDeleteItem()
   const updateTitle = useUpdateTitle()
+  // console.log(999, testFunc.toString() === getTestFunc().toString(), testFunc, getTestFunc(), get())
   return (
     <Siv title="item">
       <p>
@@ -59,7 +60,7 @@ const TodoItem = React.memo(function TodoItem(props: { item: TodoItemType }) {
         >
           ❌
         </span>
-        <span onClick={testFunc}>sdasdasd</span>
+        <span onClick={testFunc}>{testFunc.toString()}</span>
       </p>
     </Siv>
   )

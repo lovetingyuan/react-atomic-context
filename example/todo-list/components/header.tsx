@@ -23,7 +23,7 @@ const Header = React.memo(function Header() {
         <input type="submit" value="add" />
         {Object.values(Status).map(s => {
           return (
-            <span key={s}>
+            <span key={s} style={{ marginRight: 10 }}>
               <input
                 type="radio"
                 id={s}
