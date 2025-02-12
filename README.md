@@ -28,12 +28,16 @@ const AppContext = createAtomicContext({
   bar: 'bar',
 })
 
-const Foo = React.memo(function Foo() {
+const Foo = React.memo(() => {
   const { foo, setFoo, setBar } = useAtomicContext(AppContext)
   console.log('foo rendered')
   return (
     <div>
-      <p> this is foo: {foo} </p>
+      <p>
+        {' '}
+        this is foo:
+        {foo}
+      </p>
       <button
         onClick={() => {
           setFoo(`foo${Math.random().toString().slice(0, 5)}`)
@@ -54,12 +58,16 @@ const Foo = React.memo(function Foo() {
   )
 })
 
-const Bar = React.memo(function Bar() {
+const Bar = React.memo(() => {
   const { bar, setBar } = useAtomicContext(AppContext)
   console.log('bar rendered')
   return (
     <div>
-      <p> this is bar: {bar} </p>
+      <p>
+        {' '}
+        this is bar:
+        {bar}
+      </p>
       <button
         onClick={() => {
           setBar(`bar${Math.random().toString().slice(0, 5)}`)
@@ -79,14 +87,14 @@ export default function App() {
     }
   }, [])
   return (
-    <AppContext.Provider
+    <AppContext
       value={initState}
       onChange={({ key, value, oldValue }) => {
         console.log(`${key} changed from ${oldValue} to ${value}`)
       }}
     >
       <Foo />
-    </AppContext.Provider>
+    </AppContext>
   )
 }
 ```
@@ -151,7 +159,7 @@ The example above demonstrates the usage of `react-atomic-context`. As you can s
   - The `Provider` component also offers an `onChange` prop that accepts a callback function. This function is called whenever any value in the context changes. Here's an example:
 
     ```js
-    const App = () => {
+    function App() {
       const initValue = React.useMemo(() => {
         return {
           foo: 'foooo',
@@ -163,9 +171,9 @@ The example above demonstrates the usage of `react-atomic-context`. As you can s
         console.log('getters and setters', methods)
       }, [])
       return (
-        <AppContext.Provider value={initValue} onChange={handleChange}>
+        <AppContext value={initValue} onChange={handleChange}>
           <YourComponent />
-        </AppContext.Provider>
+        </AppContext>
       )
     }
     ```
@@ -181,7 +189,7 @@ The example above demonstrates the usage of `react-atomic-context`. As you can s
     ```js
     import { useAtomicContext } from 'react-atomic-context'
 
-    const MyComponent = () => {
+    function MyComponent() {
       // ✔ This is correct, reading values through destructuring
       const { foo, bar } = useAtomicContext(AppContext)
       if (foo) {
@@ -203,7 +211,7 @@ The example above demonstrates the usage of `react-atomic-context`. As you can s
     Example:
 
     ```js
-    const MyComponent = () => {
+    function MyComponent() {
       const { foo, setFoo, getFoo, bar, setBar, getBar } = useAtomicContext(AppContext)
       return (
         <div
@@ -224,7 +232,7 @@ The example above demonstrates the usage of `react-atomic-context`. As you can s
     Example:
 
     ```js
-    const MyComponent = () => {
+    function MyComponent() {
       const { bar, setFoo, getFoo } = useAtomicContext(AppContext)
       React.useEffect(() => {
         if (getFoo() !== bar) {
@@ -240,7 +248,7 @@ The example above demonstrates the usage of `react-atomic-context`. As you can s
     Example:
 
     ```js
-    const MyComponent = () => {
+    function MyComponent() {
       const { get } = useAtomicContext(AppContext)
 
       return (
@@ -262,8 +270,8 @@ This library provides comprehensive TypeScript support.
 ```typescript
 import type {
   AtomicContextGettersType,
-  AtomicContextSettersType,
   AtomicContextMethodsType,
+  AtomicContextSettersType,
   ProviderOnChangeType,
 } from 'react-atomic-context'
 

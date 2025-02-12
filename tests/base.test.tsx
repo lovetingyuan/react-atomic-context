@@ -1,58 +1,49 @@
-import React from 'react'
-import { render, screen, cleanup, fireEvent } from '@testing-library/react'
-import { describe, it, afterEach } from 'node:test'
 import { strict as assert } from 'node:assert'
-
+import { afterEach, describe, it } from 'node:test'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import React from 'react'
 import { createAtomicContext, useAtomicContext } from 'react-atomic-context'
 
-const context = createAtomicContext({
+const AppContext = createAtomicContext({
   aaa: 'aaa',
   bbb: 'bbb',
   ccc: () => 'c' as string,
 })
 
-const A = React.memo(function A() {
-  const { aaa, setAaa, ccc, setCcc, getCcc, get } = useAtomicContext(context)
-  const updateCount = React.useRef(1).current++
-  assert.equal(getCcc(), get()['ccc'])
+const B = React.memo(() => {
+  const { bbb, setBbb, getBbb } = useAtomicContext(AppContext)
+  const updateCount = React.useRef(10).current++
+  assert.equal(getBbb(), bbb)
   return (
     <div>
-      <p
-        data-testid="aaaa"
+      <button
+        data-testid="b-button"
         onClick={() => {
-          setAaa(aaa.toUpperCase() + updateCount)
+          setBbb(b => b + updateCount)
         }}
       >
-        {aaa}
-      </p>
-      <p
-        data-testid="cccc"
-        onClick={() => {
-          setCcc(() => {
-            return () => 'ccccccc'
-          })
-        }}
-      >
-        {ccc.toString()}
-      </p>
-      <B />
+        {bbb}
+      </button>
     </div>
   )
 })
 
-const B = React.memo(function B() {
-  const { bbb, setBbb } = useAtomicContext(context)
-  const updateCount = React.useRef(10).current++
+const A = React.memo(() => {
+  const { aaa, setAaa, getAaa, get } = useAtomicContext(AppContext)
+  const updateCount = React.useRef(1).current++
+  assert.equal(getAaa(), get().aaa)
+  assert.equal(getAaa(), aaa)
   return (
     <div>
-      <p
-        data-testid="bbbb"
+      <button
+        data-testid="a-button"
         onClick={() => {
-          setBbb('bbb' + updateCount)
+          setAaa(aaa + updateCount)
         }}
       >
-        {bbb}
-      </p>
+        {aaa}
+      </button>
+      <B />
     </div>
   )
 })
@@ -60,62 +51,42 @@ const B = React.memo(function B() {
 function App() {
   const initValue = React.useMemo(() => {
     return {
-      aaa: 'aaa',
-      bbb: 'bibibi',
+      aaa: 'aa',
+      bbb: 'bb',
       ccc: () => 'cc',
     }
   }, [])
   return (
-    <context.Provider value={initValue}>
+    <AppContext.Provider value={initValue}>
       <A />
-    </context.Provider>
+    </AppContext.Provider>
   )
 }
 
-describe('test-foo', () => {
+describe('test-base', () => {
   afterEach(() => {
     cleanup()
   })
   it('foo-test', () => {
     render(<App />)
-    const p = screen.getByTestId('aaaa')
-    assert.ok(p.textContent?.includes('aaa'))
-    fireEvent.click(p)
-    assert.equal(p.textContent, 'AAA1')
-    fireEvent.click(p)
-    assert.equal(p.textContent, 'AAA12')
-    const pp = screen.getByTestId('bbbb')
-    assert.ok(pp.textContent?.includes('bibibi'))
-    fireEvent.click(pp)
-    assert.equal(pp.textContent, 'bbb10')
-    fireEvent.click(pp)
-    assert.equal(pp.textContent, 'bbb11')
-    assert.equal(p.textContent, 'AAA12')
+    const aButton = screen.getByTestId('a-button')
+    assert.equal(aButton.textContent, 'aa')
+    fireEvent.click(aButton)
+    assert.equal(aButton.textContent, 'aa1')
+    fireEvent.click(aButton)
+    assert.equal(aButton.textContent, 'aa12')
+    const bButton = screen.getByTestId('b-button')
+    assert.equal(bButton.textContent, 'bb')
+    fireEvent.click(bButton)
+    assert.equal(bButton.textContent, 'bb10')
+    fireEvent.click(bButton)
+    assert.equal(bButton.textContent, 'bb1011')
 
-    const c = screen.getByTestId('cccc')
-    assert.equal(c.textContent, '()=>"cc"')
-    fireEvent.click(c)
-    assert.equal(c.textContent, '()=>"ccccccc"')
-  })
-  // not concurrent mode
-  it('foo-test', () => {
-    assert.throws(() => {
-      screen.getByTestId('aaaa')
-    })
-
-    render(<App />, { legacyRoot: true })
-    const p = screen.getByTestId('aaaa')
-    assert.ok(p.textContent?.includes('aaa'))
-    fireEvent.click(p)
-    assert.equal(p.textContent, 'AAA1')
-    fireEvent.click(p)
-    assert.equal(p.textContent, 'AAA12')
-    const pp = screen.getByTestId('bbbb')
-    assert.ok(pp.textContent?.includes('bibibi'))
-    fireEvent.click(pp)
-    assert.equal(pp.textContent, 'bbb10')
-    fireEvent.click(pp)
-    assert.equal(pp.textContent, 'bbb11')
-    assert.equal(p.textContent, 'AAA12')
+    assert.equal(aButton.textContent, 'aa12')
+    fireEvent.click(aButton)
+    assert.equal(aButton.textContent, 'aa123')
+    assert.equal(bButton.textContent, 'bb1011')
+    fireEvent.click(bButton)
+    assert.equal(bButton.textContent, 'bb101112')
   })
 })

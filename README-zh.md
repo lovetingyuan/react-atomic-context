@@ -11,11 +11,8 @@
 
 `npm i react-atomic-context`
 
-`yarn add react-atomic-context`
-
-`pnpm install react-atomic-context`
-
 打包大小 < `3kB`.
+[![minified size](https://badgen.net/bundlephobia/min/react-atomic-context)](https://bundlephobia.com/package/react-atomic-context)
 
 ## 示例:
 
@@ -28,12 +25,16 @@ const AppContext = createAtomicContext({
   bar: 'bar',
 })
 
-const Foo = React.memo(function Foo() {
+const Foo = React.memo(() => {
   const { foo, setFoo, setBar } = useAtomicContext(AppContext)
   console.log('foo rendered')
   return (
     <div>
-      <p> this is foo: {foo} </p>
+      <p>
+        {' '}
+        this is foo:
+        {foo}
+      </p>
       <button
         onClick={() => {
           setFoo(`foo${Math.random().toString().slice(0, 5)}`)
@@ -54,12 +55,16 @@ const Foo = React.memo(function Foo() {
   )
 })
 
-const Bar = React.memo(function Bar() {
+const Bar = React.memo(() => {
   const { bar, setBar } = useAtomicContext(AppContext)
   console.log('bar rendered')
   return (
     <div>
-      <p> this is bar: {bar} </p>
+      <p>
+        {' '}
+        this is bar:
+        {bar}
+      </p>
       <button
         onClick={() => {
           setBar(`bar${Math.random().toString().slice(0, 5)}`)
@@ -79,14 +84,14 @@ export default function App() {
     }
   }, [])
   return (
-    <AppContext.Provider
+    <AppContext
       value={initState}
       onChange={({ key, value, oldValue }) => {
         console.log(`${key} changed from ${oldValue} to ${value}`)
       }}
     >
       <Foo />
-    </AppContext.Provider>
+    </AppContext>
   )
 }
 ```
@@ -150,7 +155,7 @@ export default function App() {
   - `Provider`组件同时额外提供了`onChange`属性，它接收一个方法作为值，当`value`中的任何值被更改时，这个方法会被调用。下面的例子展示了它的用法：
 
     ```js
-    const App = () => {
+    function App() {
       const initValue = React.useMemo(() => {
         return {
           foo: 'foooo',
@@ -162,9 +167,9 @@ export default function App() {
         console.log('getters and setters', methods)
       }, [])
       return (
-        <AppContext.Provider value={initValue} onChange={handleChange}>
+        <AppContext value={initValue} onChange={handleChange}>
           <YourComponent />
-        </AppContext.Provider>
+        </AppContext>
       )
     }
     ```
@@ -180,7 +185,7 @@ export default function App() {
     ```js
     import { useAtomicContext } from 'react-atomic-context'
 
-    const MyComponent = () => {
+    cfunction MyComponent () {
       // ✔ 这是正确的做法，通过解构的方式读取值
       const { foo, bar } = useAtomicContext(AppContext)
       if (foo) {
@@ -194,15 +199,14 @@ export default function App() {
         return <div>{value.foo}</div>
       }
       return <div>{value.bar}</div>
-    }
-    ```
+    }```
 
   - 对于`value`中的每一个属性，都存在与之关联的两个方法（get 或者 set 加上属性名首字母大写转换后的形式）用来读写这个属性对应的值。例如对于属性`foo`，你可以使用`setFoo`方法来更改 foo 的值，可以使用`getFoo`方法来获取 foo 的最新值。首先需要明确的是调用属性对应的 set 方法是唯一更改属性值的方式。其次对于 get 方法，它们仅仅用来获取属性的最新值，这和通过解构直接读取属性值是有区别的，我们在下面会详细解释这一点。
 
     例子：
 
     ```js
-    const MyComponent = () => {
+    function MyComponent() {
       const { foo, setFoo, getFoo, bar, setBar, getBar } = useAtomicContext(AppContext)
       return (
         <div
@@ -223,7 +227,7 @@ export default function App() {
     例子：
 
     ```js
-    const MyComponent = () => {
+    function MyComponent() {
       const { bar, setFoo, getFoo } = useAtomicContext(AppContext)
       React.useEffect(() => {
         if (getFoo() !== bar) {
@@ -243,8 +247,8 @@ export default function App() {
 ```typescript
 import type {
   AtomicContextGettersType,
-  AtomicContextSettersType,
   AtomicContextMethodsType,
+  AtomicContextSettersType,
   ProviderOnChangeType,
 } from 'react-atomic-context'
 

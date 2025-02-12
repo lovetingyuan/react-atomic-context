@@ -1,9 +1,10 @@
-import { readdirSync, existsSync } from 'node:fs'
-import 'global-jsdom/register'
-import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
 import { execSync } from 'node:child_process'
+import { existsSync, readdirSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import process from 'node:process'
+import { fileURLToPath } from 'node:url'
 import React from 'react'
+import 'global-jsdom/register'
 
 globalThis.React = React
 
@@ -17,7 +18,7 @@ if (!existsSync(join(testDir, 'node_modules'))) {
   })
 }
 
-const testFiles = readdirSync(testDir).filter(f => {
+const testFiles = readdirSync(testDir).filter((f) => {
   if (!regex.test(f)) {
     return false
   }
@@ -28,16 +29,17 @@ const testFiles = readdirSync(testDir).filter(f => {
 })
 
 if (!testFiles.length) {
-  console.log('\x1b[38;5;214m%s\x1b[0m', 'no test files found.')
+  console.warn('\x1B[38;5;214m%s\x1B[0m', 'no test files found.')
 }
 
-await Promise.all(
-  testFiles.map(f => {
-    return import('./' + f).then(() => {
-      console.log('\x1b[36m%s\x1b[0m', f, 'test done:')
+Promise.all(
+  testFiles.map((f) => {
+    return import(`./${f}`).then(() => {
+      // eslint-disable-next-line no-console
+      console.log('\x1B[36m%s\x1B[0m', f, 'test done:')
     })
-  })
-).catch(err => {
+  }),
+).catch((err) => {
   console.error('test error:', err)
   throw err
 })

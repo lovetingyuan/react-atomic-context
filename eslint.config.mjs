@@ -1,41 +1,34 @@
-import { fixupConfigRules } from '@eslint/compat'
-import globals from 'globals'
-import tsParser from '@typescript-eslint/parser'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-import js from '@eslint/js'
-import { FlatCompat } from '@eslint/eslintrc'
+// eslint.config.js
+import antfu from '@antfu/eslint-config'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
+export default antfu({
+  // Type of the project. 'lib' for libraries, the default is 'app'
+  type: 'lib',
+
+  // Enable stylistic formatting rules
+  // stylistic: true,
+
+  // Or customize the stylistic rules
+  stylistic: {
+    indent: 2, // 4, or 'tab'
+    quotes: 'single', // or 'double'
+    jsx: true,
+  },
+
+  // TypeScript and Vue are autodetected, you can also explicitly enable them:
+  typescript: true,
+  react: true,
+  test: false,
+
+  // `.eslintignore` is no longer supported in Flat config, use `ignores` instead
+  ignores: [
+    'example',
+    'aaa',
+    // ...globs
+  ],
+  rules: {
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    'react/no-context-provider': 'off',
+    'react/prefer-destructuring-assignment': 'off',
+  },
 })
-
-export default [
-  {
-    ignores: ['**/dist', '**/example'],
-  },
-  ...fixupConfigRules(
-    compat.extends(
-      'eslint:recommended',
-      'plugin:@typescript-eslint/recommended',
-      'plugin:react-hooks/recommended'
-    )
-  ),
-  {
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-      },
-
-      parser: tsParser,
-    },
-
-    rules: {
-      'react-hooks/exhaustive-deps': 'error',
-    },
-  },
-]

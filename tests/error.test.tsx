@@ -1,7 +1,7 @@
-import React from 'react'
-import { render, screen, cleanup } from '@testing-library/react'
-import { describe, it, afterEach } from 'node:test'
 import { strict as assert } from 'node:assert'
+import { afterEach, describe, it } from 'node:test'
+import { cleanup, render, screen } from '@testing-library/react'
+import React from 'react'
 import { createAtomicContext, useAtomicContext } from 'react-atomic-context'
 import ErrorBoundary from './error-boundary'
 
@@ -10,7 +10,24 @@ const context = createAtomicContext({
   bbb: 'bbb',
 })
 
-const A = React.memo(function A() {
+const B = React.memo(() => {
+  const { bbb, setBbb } = useAtomicContext(context)
+  const updateCount = React.useRef(10).current++
+  return (
+    <div>
+      <p
+        data-testid="rhdsf"
+        onClick={() => {
+          setBbb(`bbb${updateCount}`)
+        }}
+      >
+        {bbb}
+      </p>
+    </div>
+  )
+})
+
+const A = React.memo(() => {
   const { aaa, setAaa } = useAtomicContext(context)
   const updateCount = React.useRef(1).current++
   return (
@@ -28,23 +45,6 @@ const A = React.memo(function A() {
   )
 })
 
-const B = React.memo(function B() {
-  const { bbb, setBbb } = useAtomicContext(context)
-  const updateCount = React.useRef(10).current++
-  return (
-    <div>
-      <p
-        data-testid="rhdsf"
-        onClick={() => {
-          setBbb('bbb' + updateCount)
-        }}
-      >
-        {bbb}
-      </p>
-    </div>
-  )
-})
-
 function App() {
   return (
     // @ts-expect-error aaa
@@ -54,13 +54,15 @@ function App() {
   )
 }
 function App3() {
+  const val = React.useMemo(() => {
+    return {
+      foo: false,
+      aaa: 'aaa',
+    }
+  }, [])
   return (
-    <context.Provider
-      value={{
-        // @ts-expect-error aaa
-        foo: false,
-      }}
-    >
+    // @ts-expect-error for test
+    <context.Provider value={val}>
       <A />
     </context.Provider>
   )
@@ -70,12 +72,12 @@ describe('error-cases-test', () => {
   afterEach(() => {
     cleanup()
   })
-  it('throws-no-provider', t => {
+  it('throws-no-provider', (t) => {
     t.mock.method(console, 'error', () => {})
     render(
       <ErrorBoundary>
         <A />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
     assert.throws(() => {
       screen.getByTestId('dksflj')
@@ -83,23 +85,23 @@ describe('error-cases-test', () => {
     const error = screen.getByTestId('error-msg')
     assert.ok(error.innerHTML.includes('wrapped by the Provider'))
   })
-  it('throws-no-value', t => {
+  it('throws-no-value', (t) => {
     t.mock.method(console, 'error', () => {})
     render(
       <ErrorBoundary>
         <App />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
     const error = screen.getByTestId('error-msg')
     assert.ok(error.innerHTML.includes('is required and must be object'))
   })
 
-  it('throws-no-exist-property', t => {
+  it('throws-no-exist-property', (t) => {
     t.mock.method(console, 'error', () => {})
     render(
       <ErrorBoundary>
         <App3 />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
     const error = screen.getByTestId('error-msg')
     assert.ok(error.innerHTML.includes('does not exist in the initial value'))
@@ -112,7 +114,7 @@ describe('error-cases-test', () => {
       },
       {
         message: /is required and must be object/,
-      }
+      },
     )
   })
 })

@@ -2,12 +2,12 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "allowImportingTsExtensions": true,
     "paths": {
       "react-atomic-context": [
         "../"
       ]
-    }
+    },
+    "allowImportingTsExtensions": true
   },
   "include": [
     "."

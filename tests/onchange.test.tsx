@@ -1,12 +1,9 @@
-import React from 'react'
-import { render, screen, cleanup, fireEvent } from '@testing-library/react'
-import { describe, it, afterEach, mock } from 'node:test'
+import type { ProviderOnChangeType } from 'react-atomic-context'
 import { strict as assert } from 'node:assert'
-import {
-  createAtomicContext,
-  useAtomicContext,
-  type ProviderOnChangeType,
-} from 'react-atomic-context'
+import { afterEach, describe, it, mock } from 'node:test'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import React from 'react'
+import { createAtomicContext, useAtomicContext } from 'react-atomic-context'
 
 const init = {
   a: 'aaa',
@@ -14,37 +11,37 @@ const init = {
 }
 const context = createAtomicContext(init)
 
-const A = React.memo(function A() {
-  const { a, setA } = useAtomicContext(context)
-  const updateCount = React.useRef(1).current++
-  return (
-    <div>
-      <p
-        data-testid="dksflj"
-        onClick={() => {
-          setA('aaa' + updateCount)
-        }}
-      >
-        {a}
-      </p>
-      <B />
-    </div>
-  )
-})
-
-const B = React.memo(function B() {
+const B = React.memo(() => {
   const { b, setB } = useAtomicContext(context)
   const updateCount = React.useRef(10).current++
   return (
     <div>
-      <p
-        data-testid="rhdsf"
+      <button
+        data-testid="b-button"
         onClick={() => {
-          setB('bbb' + updateCount)
+          setB(`B${updateCount}`)
         }}
       >
         {b}
-      </p>
+      </button>
+    </div>
+  )
+})
+
+const A = React.memo(() => {
+  const { a, setA } = useAtomicContext(context)
+  const updateCount = React.useRef(1).current++
+  return (
+    <div>
+      <button
+        data-testid="a-button"
+        onClick={() => {
+          setA(`A${updateCount}`)
+        }}
+      >
+        {a}
+      </button>
+      <B />
     </div>
   )
 })
@@ -52,8 +49,8 @@ const B = React.memo(function B() {
 function App(props: { onChange: ProviderOnChangeType<typeof init> }) {
   const initValue = React.useMemo(() => {
     return {
-      a: 'aaa',
-      b: 'bbb',
+      a: 'A',
+      b: 'B',
     }
   }, [])
   return (
@@ -70,30 +67,30 @@ describe('onchange-test', () => {
   it('click-a-b', () => {
     const onChange = mock.fn()
     render(<App onChange={onChange} />)
-    const aa = screen.getByTestId('dksflj')
-    const bb = screen.getByTestId('rhdsf')
+    const aButton = screen.getByTestId('a-button')
+    const bButton = screen.getByTestId('b-button')
     const baseCount = 0
     assert.strictEqual(onChange.mock.calls.length, baseCount)
-    fireEvent.click(aa)
+    fireEvent.click(aButton)
     assert.strictEqual(onChange.mock.calls.length, baseCount + 1)
     const call = onChange.mock.calls[baseCount]
-    assert.deepStrictEqual(call.arguments[0], { key: 'a', value: 'aaa1', oldValue: 'aaa' })
+    assert.deepStrictEqual(call.arguments[0], { key: 'a', value: 'A1', oldValue: 'A' })
     assert.deepStrictEqual(Object.keys(call.arguments[1]).sort(), ['getA', 'getB', 'setA', 'setB'])
-    assert.deepStrictEqual(call.arguments[1].get(), { a: 'aaa1', b: 'bbb' })
-    fireEvent.click(bb)
+    assert.deepStrictEqual(call.arguments[1].get(), { a: 'A1', b: 'B' })
+    fireEvent.click(bButton)
     assert.strictEqual(onChange.mock.calls.length, baseCount + 2)
     const call2 = onChange.mock.calls[baseCount + 1]
-    assert.deepStrictEqual(call2.arguments[0], { key: 'b', value: 'bbb10', oldValue: 'bbb' })
-    assert.deepStrictEqual(call2.arguments[1].get(), { a: 'aaa1', b: 'bbb10' })
-    fireEvent.click(aa)
+    assert.deepStrictEqual(call2.arguments[0], { key: 'b', value: 'B10', oldValue: 'B' })
+    assert.deepStrictEqual(call2.arguments[1].get(), { a: 'A1', b: 'B10' })
+    fireEvent.click(aButton)
     assert.strictEqual(onChange.mock.calls.length, baseCount + 3)
     const call3 = onChange.mock.calls[baseCount + 2]
-    assert.deepStrictEqual(call3.arguments[0], { key: 'a', value: 'aaa2', oldValue: 'aaa1' })
-    assert.deepStrictEqual(call3.arguments[1].get(), { a: 'aaa2', b: 'bbb10' })
-    fireEvent.click(bb)
+    assert.deepStrictEqual(call3.arguments[0], { key: 'a', value: 'A2', oldValue: 'A1' })
+    assert.deepStrictEqual(call3.arguments[1].get(), { a: 'A2', b: 'B10' })
+    fireEvent.click(bButton)
     assert.strictEqual(onChange.mock.calls.length, baseCount + 4)
     const call4 = onChange.mock.calls[baseCount + 3]
-    assert.deepStrictEqual(call4.arguments[0], { key: 'b', value: 'bbb11', oldValue: 'bbb10' })
-    assert.deepStrictEqual(call4.arguments[1].get(), { a: 'aaa2', b: 'bbb11' })
+    assert.deepStrictEqual(call4.arguments[0], { key: 'b', value: 'B11', oldValue: 'B10' })
+    assert.deepStrictEqual(call4.arguments[1].get(), { a: 'A2', b: 'B11' })
   })
 })
