@@ -17,6 +17,7 @@ const B = React.memo(() => {
   return (
     <div>
       <button
+        type="button"
         data-testid="b-button"
         onClick={() => {
           setB(`B${updateCount}`)
@@ -34,6 +35,7 @@ const A = React.memo(() => {
   return (
     <div>
       <button
+        type="button"
         data-testid="a-button"
         onClick={() => {
           setA(`A${updateCount}`)
