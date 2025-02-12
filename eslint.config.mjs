@@ -19,6 +19,7 @@ export default antfu({
   typescript: true,
   react: true,
   test: false,
+  markdown: false,
 
   // `.eslintignore` is no longer supported in Flat config, use `ignores` instead
   ignores: [
