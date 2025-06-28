@@ -99,7 +99,17 @@ export default function App() {
 }
 ```
 
+## 🌏  Open in the Cloud 
+Click the button below to start a new development environment:
+
+[![Open in VS Code](https://img.shields.io/badge/Open%20in-VS%20Code-blue?logo=visualstudiocode)](https://vscode.dev/github/lovetingyuan/react-atomic-context)
+[![Open in Glitch](https://img.shields.io/badge/Open%20in-Glitch-blue?logo=glitch)](https://glitch.com/edit/#!/import/github/lovetingyuan/react-atomic-context)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/lovetingyuan/react-atomic-context)
 [![Open in CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/react-atomic-context-4mkp5t?file=%2Fsrc%2FApp.js%3A71%2C1)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/lovetingyuan/react-atomic-context)
+[![Open in Repl.it](https://replit.com/badge/github/withastro/astro)](https://replit.com/github/lovetingyuan/react-atomic-context)
+[![Open in Codeanywhere](https://codeanywhere.com/img/open-in-codeanywhere-btn.svg)](https://app.codeanywhere.com/#https://github.com/lovetingyuan/react-atomic-context)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/lovetingyuan/react-atomic-context)
 
 The example above demonstrates the usage of `react-atomic-context`. As you can see, the usage is very similar to native React Context. Please read the following sections for important considerations.
 
