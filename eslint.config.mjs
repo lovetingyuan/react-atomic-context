@@ -9,11 +9,13 @@ export default antfu({
   // stylistic: true,
 
   // Or customize the stylistic rules
-  stylistic: {
-    indent: 2, // 4, or 'tab'
-    quotes: 'single', // or 'double'
-    jsx: true,
-  },
+  stylistic: false,
+  //  {
+  //   indent: 2, // 4, or 'tab'
+  //   quotes: 'single', // or 'double'
+  //   jsx: true,
+  //   arrowParens: false,
+  // },
 
   // TypeScript and Vue are autodetected, you can also explicitly enable them:
   typescript: true,
@@ -22,11 +24,7 @@ export default antfu({
   markdown: false,
 
   // `.eslintignore` is no longer supported in Flat config, use `ignores` instead
-  ignores: [
-    'example',
-    'aaa',
-    // ...globs
-  ],
+  ignores: ['example'],
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'off',
     'react/no-context-provider': 'off',

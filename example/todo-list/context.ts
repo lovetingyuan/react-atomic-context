@@ -1,9 +1,5 @@
 import React from 'react'
-import {
-  createAtomicContext,
-  useAtomicContext,
-  useAtomicContextMethods,
-} from 'react-atomic-context'
+import { createAtomicContext, useAtomicContext } from 'react-atomic-context'
 
 export enum Status {
   todo = 'todo',
@@ -38,6 +34,5 @@ export const useTodoValue = () => {
   return React.useMemo(getInitValue, [])
 }
 export const useTodoContext = () => useAtomicContext(TodoContext)
-export const useTodoContextMethods = () => useAtomicContextMethods(TodoContext)
 
 export const TodoProvider = TodoContext.Provider

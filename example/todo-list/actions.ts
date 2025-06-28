@@ -1,9 +1,9 @@
 import React from 'react'
-import { Status, useTodoContextMethods } from './context.ts'
+import { Status, useTodoContext } from './context.ts'
 
 // actions
 export function useAddTodoItem() {
-  const { setTodoList } = useTodoContextMethods()
+  const { setTodoList } = useTodoContext()
   return React.useCallback((title: string) => {
     setTodoList(list => {
       return list.concat({
@@ -16,7 +16,7 @@ export function useAddTodoItem() {
 }
 
 export function useChangeStatus() {
-  const { setTodoList } = useTodoContextMethods()
+  const { setTodoList } = useTodoContext()
   return (id: string, status: Status) => {
     setTodoList(list => {
       const index = list.findIndex(v => v.id === id)
@@ -31,14 +31,14 @@ export function useChangeStatus() {
 }
 
 export function useDeleteItem() {
-  const { setTodoList } = useTodoContextMethods()
+  const { setTodoList } = useTodoContext()
   return (id: string) => {
     setTodoList(list => list.filter(v => v.id !== id))
   }
 }
 
 export function useUpdateTitle() {
-  const { setTodoList } = useTodoContextMethods()
+  const { setTodoList } = useTodoContext()
   return (id: string, title: string) => {
     setTodoList(list => {
       const index = list.findIndex(v => v.id === id)

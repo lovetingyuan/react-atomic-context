@@ -8,7 +8,7 @@ export type GetSetKey<K, O extends 'get' | 'set'> = K extends `${infer L}${infer
  */
 export type AtomicContextGettersType<
   T extends Record<string, unknown>,
-  K extends keyof T = keyof T,
+  K extends keyof T = keyof T
 > = {
   [k in K as GetSetKey<k, 'get'>]: () => T[k]
 }
@@ -18,7 +18,7 @@ export type AtomicContextGettersType<
  */
 export type AtomicContextSettersType<
   T extends Record<string, unknown>,
-  K extends keyof T = keyof T,
+  K extends keyof T = keyof T
 > = {
   [k in K as GetSetKey<k, 'set'>]: (
     newValue: T[k] extends (...v: infer A) => infer R
@@ -29,13 +29,13 @@ export type AtomicContextSettersType<
 
 export type AtomicContextMethodsType<
   T extends Record<string, unknown>,
-  K extends keyof T = keyof T,
+  K extends keyof T = keyof T
 > = Omit<
   AtomicContextSettersType<T, K> &
-  AtomicContextGettersType<T, K> & {
-    /** get current context value */
-    get: () => Readonly<T>
-  },
+    AtomicContextGettersType<T, K> & {
+      /** get current context value */
+      get: () => Readonly<T>
+    },
   ''
 >
 
@@ -52,7 +52,7 @@ export type AtomicContextValueType<T extends Record<string, unknown>> = Omit<
  */
 export type ProviderOnChangeType<T extends Record<string, unknown>> = (
   changeInfo: {
-    [K in keyof T]: { key: K, value: T[K], oldValue: T[K] }
+    [K in keyof T]: { key: K; value: T[K]; oldValue: T[K] }
   }[keyof T],
   methods: AtomicContextMethodsType<T>
 ) => void
@@ -62,28 +62,37 @@ export type ContextsType<T extends Record<string, unknown>> = {
 }
 
 export interface RootValue<T extends Record<string, unknown>> {
-  getterSetters: AtomicContextMethodsType<T> | null
-  valueRef: React.MutableRefObject<T> | null
-  onChangeRef: React.MutableRefObject<ProviderOnChangeType<T> | undefined> | null
+  valueRef: React.RefObject<T> | null
+  onChangeRef: React.RefObject<ProviderOnChangeType<T> | undefined> | null
+  contextValue: AtomicContextValueType<T> | null
 }
 
 /**
  * atomic context Provider component type.
  */
-export type AtomicProviderType<T extends Record<string, unknown>> = (
-  props: React.ProviderProps<T> & {
-    onChange?: ProviderOnChangeType<T>
-  }
-) => React.FunctionComponentElement<React.ProviderProps<RootValue<T>>>
+// export type AtomicProviderType<T extends Record<string, unknown>> = (
+//   props: React.ProviderProps<T> & {
+//     onChange?: ProviderOnChangeType<T>
+//   }
+// ) => React.ReactElement<React.ProviderProps<RootValue<T>>>
 
 /**
  * type of atomic context(return type of `createAtomicContext`)
  */
 export interface AtomicContextType<T extends Record<string, unknown>> {
+  (
+    props: React.ProviderProps<T> & {
+      onChange?: ProviderOnChangeType<T>
+    }
+  ): React.ReactElement<React.ProviderProps<RootValue<T>>>
   _contexts: ContextsType<T>
   displayName?: string
-  _atomicContext: React.Context<RootValue<T>>
-  Provider: React.MemoExoticComponent<AtomicProviderType<T>>
+  _RootContext: React.Context<RootValue<T>>
+  Provider: (
+    props: React.ProviderProps<T> & {
+      onChange?: ProviderOnChangeType<T>
+    }
+  ) => React.ReactElement<React.ProviderProps<RootValue<T>>>
   typeof: '$AtomicContext'
 }
 

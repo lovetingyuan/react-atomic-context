@@ -9,4 +9,4 @@ const RootContext = createAtomicContext({
 })
 
 export const useBaseContext = () => useAtomicContext(RootContext)
-export const Provider = RootContext.Provider
+export const Provider = RootContext

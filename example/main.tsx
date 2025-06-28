@@ -43,11 +43,14 @@ async function start() {
     </React.StrictMode>
   )
   const container = document.getElementById('root')!
-  if (React.version.startsWith('18.')) {
+  const version = React.version.split('.')[0]
+  // @ts-ignore
+  if (version > 17) {
     const ReactDOM = await import('react-dom/client')
     ReactDOM.createRoot(container).render(app)
   } else {
     const ReactDOM = (await import('react-dom')).default
+    // @ts-ignore
     ReactDOM.render(app, container)
   }
 }
