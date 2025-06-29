@@ -59,7 +59,7 @@ function createAtomicContext<T extends Record<string, unknown>>(
   const AtomProviderWrapper = React.memo(
     (props: React.PropsWithChildren<{ valueKey: keyof T }>) => {
       const key = props.valueKey
-      const { valueRef, onChangeRef, contextValue } = React.useContext(RootContext)
+      const { valueRef, onChangeRef, contextValue } = useContext(RootContext)
       if (!valueRef?.current) {
         throw new Error(NotUnderProviderError)
       }
@@ -89,7 +89,7 @@ function createAtomicContext<T extends Record<string, unknown>>(
         }
       }
 
-      return React.createElement(contexts[key], { value: val }, props.children)
+      return React.createElement(contexts[key].Provider, { value: val }, props.children)
     }
   )
   AtomProviderWrapper.displayName = 'AtomicProviderInner'
@@ -158,7 +158,7 @@ function createAtomicContext<T extends Record<string, unknown>>(
         contextValue,
       } satisfies RootValue<T>
     })
-    return React.createElement(RootContext, { value: rootValue }, provider)
+    return React.createElement(RootContext.Provider, { value: rootValue }, provider)
   }
 
   Object.assign(Provider, {
