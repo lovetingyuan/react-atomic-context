@@ -1,22 +1,20 @@
-import type {
-  AtomicContextMethodsType,
-  AtomicContextType,
-  AtomicContextValueType,
-  // AtomicProviderType,
-  ContextsType,
-  ProviderOnChangeType,
-  RootValue,
-} from './types.ts'
 /**
  * Optimized React context. Created by tingyuan.
  * Allows individual reading and writing of each property of the value
  * while preventing unnecessary full re-renders.
  */
+import type {
+  AtomicContextMethodsType,
+  AtomicContextType,
+  AtomicContextValueType,
+  ContextOnChangeType,
+  ContextsType,
+  RootValue,
+} from './types.ts'
 import React from 'react'
 import { name } from '../package.json'
 
 const useContext = React.use || React.useContext
-
 const NotUnderProviderError = `${name}: components using useAtomicContext must be wrapped by the Provider.`
 
 // https://github.com/Andarist/use-constant
@@ -25,7 +23,6 @@ function useConstant<T>(fn: () => T): T {
   if (!ref.current) {
     ref.current = { v: fn() }
   }
-
   return ref.current.v
 }
 
@@ -99,7 +96,7 @@ function createAtomicContext<T extends Record<string, unknown>>(
 
   function Provider(
     props: React.ProviderProps<T> & {
-      onChange?: ProviderOnChangeType<T>
+      onChange?: ContextOnChangeType<T>
     }
   ): React.ReactElement<React.ProviderProps<RootValue<T>>> {
     if (Object.prototype.toString.call(props.value) !== '[object Object]') {
@@ -108,12 +105,9 @@ function createAtomicContext<T extends Record<string, unknown>>(
     if ('onChange' in props && typeof props.onChange !== 'function') {
       throw new Error(`${name}: "onChange" prop of <Provider> must be a function.`)
     }
-
     const valueRef = React.useRef<T>(props.value)
-
     const onChangeRef = React.useRef(props.onChange)
     onChangeRef.current = props.onChange
-
     let provider = props.children
     const keys = Object.keys(props.value) as (keyof T)[]
     for (const key of keys) {
@@ -167,71 +161,6 @@ function createAtomicContext<T extends Record<string, unknown>>(
     return React.createElement(RootContext, { value: rootValue }, provider)
   }
 
-  // const _Provider = React.memo<AtomicProviderType<T>>(props => {
-  //   if (Object.prototype.toString.call(props.value) !== '[object Object]') {
-  //     throw new Error(`${name}: "value" prop of <Provider> is required and must be object.`)
-  //   }
-  //   if ('onChange' in props && typeof props.onChange !== 'function') {
-  //     throw new Error(`${name}: "onChange" prop of <Provider> must be a function.`)
-  //   }
-
-  //   const valueRef = React.useRef<T>(props.value)
-
-  //   const onChangeRef = React.useRef(props.onChange)
-  //   onChangeRef.current = props.onChange
-
-  //   let provider = props.children
-  //   const keys = Object.keys(props.value) as (keyof T)[]
-  //   for (const key of keys) {
-  //     if (!(key in contexts)) {
-  //       throw new Error(
-  //         `${name}: property "${String(
-  //           key
-  //         )}" does not exist in the initial value passed to createAtomicContext.`
-  //       )
-  //     }
-  //     provider = React.createElement(
-  //       AtomProviderWrapper,
-  //       {
-  //         valueKey: key,
-  //       },
-  //       provider
-  //     )
-  //   }
-  //   const rootValue = useConstant<RootValue<T>>(() => {
-  //     const methods: AtomicContextMethodsType<T> = Object.create({
-  //       get() {
-  //         console.warn(
-  //           `${name}: The "get()" method is only used for development to inspect the current context value.`
-  //         )
-  //         return Object.freeze({ ...valueRef.current })
-  //       },
-  //     })
-  //     for (const key of keys) {
-  //       const k = key as string
-  //       const getKey = `get${k[0].toUpperCase()}${k.slice(1)}`
-  //       // @ts-expect-error good to runtime
-  //       methods[getKey] = () => valueRef.current[key]
-  //     }
-
-  //     const contextValue = Object.create(methods) as AtomicContextValueType<T>
-  //     Object.keys(contexts).forEach(key => {
-  //       Object.defineProperty(contextValue, key, {
-  //         get() {
-  //           // eslint-disable-next-line react-hooks/rules-of-hooks
-  //           return useContext(contexts[key])
-  //         },
-  //       })
-  //     })
-
-  //     return {
-  //       valueRef,
-  //       onChangeRef,
-  //       contextValue,
-  //     } satisfies RootValue<T>
-  //   })
-  //   return React.createElement(RootContext, { value: rootValue }, provider)
-  // })
   Object.assign(Provider, {
     Provider,
     typeof: '$AtomicContext' as const,
@@ -244,7 +173,6 @@ function createAtomicContext<T extends Record<string, unknown>>(
       RootContext.displayName = n
     },
   })
-
   return Provider as unknown as AtomicContextType<T>
 }
 
@@ -263,5 +191,4 @@ function useAtomicContext<T extends Record<string, unknown>>(context: AtomicCont
 }
 
 export { createAtomicContext, useAtomicContext }
-
-export type { AtomicContextMethodsType, ProviderOnChangeType }
+export type { AtomicContextMethodsType, ContextOnChangeType }
