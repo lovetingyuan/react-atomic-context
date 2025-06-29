@@ -14,6 +14,8 @@
 打包大小 < `3kB`.
 [![minified size](https://badgen.net/bundlephobia/min/react-atomic-context)](https://bundlephobia.com/package/react-atomic-context)
 
+支持 React 19,18,17,16
+
 ## 示例:
 
 ```tsx
