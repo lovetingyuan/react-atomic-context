@@ -48,9 +48,20 @@ export type AtomicContextValueType<T extends Record<string, unknown>> = Omit<
 >
 
 /**
+ * @deprecated use ContextOnChangeType instead.
  * type of onChange callback which is passed to Provider.
  */
 export type ProviderOnChangeType<T extends Record<string, unknown>> = (
+  changeInfo: {
+    [K in keyof T]: { key: K; value: T[K]; oldValue: T[K] }
+  }[keyof T],
+  methods: AtomicContextMethodsType<T>
+) => void
+
+/**
+ * type of onChange callback which is passed to Context.
+ */
+export type ContextOnChangeType<T extends Record<string, unknown>> = (
   changeInfo: {
     [K in keyof T]: { key: K; value: T[K]; oldValue: T[K] }
   }[keyof T],
