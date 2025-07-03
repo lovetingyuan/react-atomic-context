@@ -135,22 +135,19 @@ function createAtomicContext<T extends Record<string, unknown>>(
           return Object.freeze({ ...valueRef.current })
         },
       })
+      const contextValue = Object.create(methods) as AtomicContextValueType<T>
       for (const key of keys) {
         const k = key as string
         const getKey = `get${k[0].toUpperCase()}${k.slice(1)}`
         // @ts-expect-error good to runtime
         methods[getKey] = () => valueRef.current[key]
-      }
-
-      const contextValue = Object.create(methods) as AtomicContextValueType<T>
-      Object.keys(contexts).forEach(key => {
         Object.defineProperty(contextValue, key, {
           get() {
             // eslint-disable-next-line react-hooks/rules-of-hooks
             return useContext(contexts[key])
           },
         })
-      })
+      }
 
       return {
         valueRef,
