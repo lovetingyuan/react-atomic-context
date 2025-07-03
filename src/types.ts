@@ -48,17 +48,6 @@ export type AtomicContextValueType<T extends Record<string, unknown>> = Omit<
 >
 
 /**
- * @deprecated use ContextOnChangeType instead.
- * type of onChange callback which is passed to Provider.
- */
-export type ProviderOnChangeType<T extends Record<string, unknown>> = (
-  changeInfo: {
-    [K in keyof T]: { key: K; value: T[K]; oldValue: T[K] }
-  }[keyof T],
-  methods: AtomicContextMethodsType<T>
-) => void
-
-/**
  * type of onChange callback which is passed to Context.
  */
 export type ContextOnChangeType<T extends Record<string, unknown>> = (
@@ -74,18 +63,9 @@ export type ContextsType<T extends Record<string, unknown>> = {
 
 export interface RootValue<T extends Record<string, unknown>> {
   valueRef: React.RefObject<T> | null
-  onChangeRef: React.RefObject<ProviderOnChangeType<T> | undefined> | null
+  onChangeRef: React.RefObject<ContextOnChangeType<T> | undefined> | null
   contextValue: AtomicContextValueType<T> | null
 }
-
-/**
- * atomic context Provider component type.
- */
-// export type AtomicProviderType<T extends Record<string, unknown>> = (
-//   props: React.ProviderProps<T> & {
-//     onChange?: ProviderOnChangeType<T>
-//   }
-// ) => React.ReactElement<React.ProviderProps<RootValue<T>>>
 
 /**
  * type of atomic context(return type of `createAtomicContext`)
@@ -93,7 +73,7 @@ export interface RootValue<T extends Record<string, unknown>> {
 export interface AtomicContextType<T extends Record<string, unknown>> {
   (
     props: React.ProviderProps<T> & {
-      onChange?: ProviderOnChangeType<T>
+      onChange?: ContextOnChangeType<T>
     }
   ): React.ReactElement<React.ProviderProps<RootValue<T>>>
   _contexts: ContextsType<T>
@@ -101,7 +81,7 @@ export interface AtomicContextType<T extends Record<string, unknown>> {
   _RootContext: React.Context<RootValue<T>>
   Provider: (
     props: React.ProviderProps<T> & {
-      onChange?: ProviderOnChangeType<T>
+      onChange?: ContextOnChangeType<T>
     }
   ) => React.ReactElement<React.ProviderProps<RootValue<T>>>
   typeof: '$AtomicContext'
