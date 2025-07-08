@@ -9,7 +9,7 @@ import type {
   AtomicContextValueType,
   ContextOnChangeType,
   ContextsType,
-  RootValue,
+  RootValueType,
 } from './types.ts'
 import React from 'react'
 import { name } from '../package.json'
@@ -49,7 +49,7 @@ function createAtomicContext<T extends Record<string, unknown>>(
     }
   }
 
-  const RootContext = React.createContext<RootValue<T>>({
+  const RootContext = React.createContext<RootValueType<T>>({
     valueRef: null,
     onChangeRef: null,
     contextValue: null,
@@ -98,7 +98,7 @@ function createAtomicContext<T extends Record<string, unknown>>(
     props: React.ProviderProps<T> & {
       onChange?: ContextOnChangeType<T>
     }
-  ): React.ReactElement<React.ProviderProps<RootValue<T>>> {
+  ): React.ReactElement<React.ProviderProps<RootValueType<T>>> {
     if (Object.prototype.toString.call(props.value) !== '[object Object]') {
       throw new Error(`${name}: "value" prop of <Provider> is required and must be object.`)
     }
@@ -126,7 +126,7 @@ function createAtomicContext<T extends Record<string, unknown>>(
         provider
       )
     }
-    const rootValue = useConstant<RootValue<T>>(() => {
+    const rootValue = useConstant<RootValueType<T>>(() => {
       const methods: AtomicContextMethodsType<T> = Object.create({
         get() {
           console.warn(
@@ -153,7 +153,7 @@ function createAtomicContext<T extends Record<string, unknown>>(
         valueRef,
         onChangeRef,
         contextValue,
-      } satisfies RootValue<T>
+      } satisfies RootValueType<T>
     })
     return React.createElement(RootContext.Provider, { value: rootValue }, provider)
   }

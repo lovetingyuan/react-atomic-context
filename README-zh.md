@@ -14,7 +14,7 @@
 打包大小 < `3kB`.
 [![minified size](https://badgen.net/bundlephobia/min/react-atomic-context)](https://bundlephobia.com/package/react-atomic-context)
 
-支持 React 19,18,17,16
+支持 React 16 ~ 19
 
 ## 示例:
 
@@ -320,12 +320,17 @@ type OnChange = ContextOnChangeType<typeof initValue>
    首先容易忽略的一点是，**不要忘记使用`React.useMemo`去包装你的组件**。
    其次，不只是 context，还有其它的因素会造成组件的重渲染。例如最终调用了 setState、第三方的 hook、external storage subscribe、使用了常规的 context、组件的 key 发生了变化等。
 
+5. 怎么在组件外部读写值？
+
+   不支持。如果实在需要这样做，你可以创建一个不渲染内容的空组件放到 Provider 下面，然后在这个组件内包装一些读写的方法暴露出去。
+
 ## 注意事项
 
 1. 创建 context 时必须传入对象类型的初始值，传递给 Context 组件 的 value 不能包含初始值所含属性之外的属性。这一点已经在 API 用法中提到了。
 2. 属性的 getter 方法是“同步的”。例如对于`foo`这个属性来讲，当你调用`setFoo(123)`后立即调用`getFoo()`，返回的就是`123`。所以如果你同时用解构的方式和调用 getter 方法的方式来获取同一个属性值，有可能存在结果不一致的情况，因为解构的值是`React.useState`返回的，它是“异步的”。
 3. 属性的 setter 方法不能在组件函数中直接调用，也就是不支持“eager bailout”，这相当于调用其它组件的 `setState` 方法，会造成 react 的渲染问题。
 4. 当某个属性的值是函数类型时需要特别注意。修改函数类型的属性时，setter 方法必须使用返回方法的回调函数作为参数。例如`{foo: () => 123}`，当修改 foo 的时候必须这样调用：`setFoo(() => () => 456)`，而不能是`setFoo(() => 456)`。
+5. 不要将`useAtomicContext`的返回值传递到其它函数甚至是组件外部使用。至少保证对属性的读取仅发生在组件同步渲染阶段。
 
 ---
 

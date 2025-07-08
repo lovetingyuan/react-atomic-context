@@ -14,7 +14,7 @@ For these problems, this library provides a simple solution. It can help you rea
 Bundle size < `3kB`.
 [![minified size](https://badgen.net/bundlephobia/min/react-atomic-context)](https://bundlephobia.com/package/react-atomic-context)
 
-Support React 19,18,17,16
+Support React 16 ~ 19
 
 ## Example:
 

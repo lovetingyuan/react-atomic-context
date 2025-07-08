@@ -61,7 +61,7 @@ export type ContextsType<T extends Record<string, unknown>> = {
   [k in keyof T]: React.Context<T[k]>
 }
 
-export interface RootValue<T extends Record<string, unknown>> {
+export interface RootValueType<T extends Record<string, unknown>> {
   valueRef: React.RefObject<T> | null
   onChangeRef: React.RefObject<ContextOnChangeType<T> | undefined> | null
   contextValue: AtomicContextValueType<T> | null
@@ -75,15 +75,15 @@ export interface AtomicContextType<T extends Record<string, unknown>> {
     props: React.ProviderProps<T> & {
       onChange?: ContextOnChangeType<T>
     }
-  ): React.ReactElement<React.ProviderProps<RootValue<T>>>
+  ): React.ReactElement<React.ProviderProps<RootValueType<T>>>
   _contexts: ContextsType<T>
   displayName?: string
-  _RootContext: React.Context<RootValue<T>>
+  _RootContext: React.Context<RootValueType<T>>
   Provider: (
     props: React.ProviderProps<T> & {
       onChange?: ContextOnChangeType<T>
     }
-  ) => React.ReactElement<React.ProviderProps<RootValue<T>>>
+  ) => React.ReactElement<React.ProviderProps<RootValueType<T>>>
   typeof: '$AtomicContext'
 }
 
