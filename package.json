@@ -42,8 +42,8 @@
     "test": "tsx tests",
     "build": "tsup src/index.ts --dts --format esm",
     "dev": "npx -y live-server .",
-    "prepublishOnly": "npm run lint && npm run build",
-    "pub": "np",
+    "prepublishOnly": "npm run lint && npm run build && npm test",
+    "pub": "np --no-tests",
     "lint": "npx -y oxlint@latest src tests"
   },
   "peerDependencies": {
