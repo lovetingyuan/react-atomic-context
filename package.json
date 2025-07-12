@@ -39,8 +39,8 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "test": "npx tsx tests",
-    "build": "npx tsup src/index.ts --dts --format esm",
+    "test": "tsx tests",
+    "build": "tsup src/index.ts --dts --format esm",
     "dev": "npx -y live-server .",
     "prepublishOnly": "npm run lint && npm run build && npm test",
     "pub": "npx np",
@@ -55,6 +55,7 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "global-jsdom": "26.0.0",
+    "np": "^10.2.0",
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
     "typescript": "^5.2.2"
