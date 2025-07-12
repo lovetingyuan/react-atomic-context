@@ -1,7 +1,7 @@
 {
   "name": "react-atomic-context",
   "type": "module",
-  "version": "3.0.0-0",
+  "version": "2.1.0",
   "description": "Optimized React context",
   "author": "tingyuan",
   "license": "MIT",
