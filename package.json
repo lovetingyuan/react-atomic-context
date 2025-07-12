@@ -1,5 +1,6 @@
 {
   "name": "react-atomic-context",
+  "type": "module",
   "version": "2.1.0",
   "description": "Optimized React context",
   "author": "tingyuan",
@@ -22,26 +23,9 @@
   ],
   "sideEffects": false,
   "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      },
-      "default": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      }
-    },
-    "./package.json": "./package.json",
-    "./dist/*": "./dist/*"
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.js"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -55,30 +39,23 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "test": "npx tsx tests",
-    "build": "unbuild",
-    "dev": "live-server .",
+    "test": "npx -y tsx tests",
+    "build": "npx tsup src/index.ts --dts --format esm",
+    "dev": "npx -y live-server .",
     "prepublishOnly": "npm run lint && npm run build && npm test",
     "pub": "npx np",
-    "lint": "eslint . --fix"
+    "lint": "npx -y oxlint@latest src tests"
   },
   "peerDependencies": {
     "react": ">=16.8.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.2.0",
-    "@eslint-react/eslint-plugin": "^1.26.2",
     "@testing-library/react": "^16.0.1",
     "@types/node": "^20.10.4",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
-    "@typescript-eslint/eslint-plugin": "^8.11.0",
-    "@typescript-eslint/parser": "^8.11.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
     "global-jsdom": "26.0.0",
-    "tsx": "^4.7.0",
-    "typescript": "^5.2.2",
-    "unbuild": "^3.3.0"
+    "tsup": "^8.5.0",
+    "typescript": "^5.2.2"
   }
 }
