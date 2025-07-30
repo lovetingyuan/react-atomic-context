@@ -64,28 +64,18 @@ function createAtomicContext<T extends Record<string, unknown>>(
         throw new Error(NotUnderProviderError)
       }
       const [val, setVal] = React.useState(() => valueRef.current[key])
-      const valRef = React.useRef(val)
-      valRef.current = val
       const k = key as string
       const setKey = `set${k[0].toUpperCase()}${k.slice(1)}` as const
 
       const methods = Object.getPrototypeOf(contextValue) as AtomicContextMethodsType<T>
       if (!(setKey in methods)) {
         // @ts-expect-error good to runtime
-        methods[setKey] = (value: T[keyof T]) => {
-          setVal(v => {
-            if (typeof value === 'function') {
-              const result = value(v)
-              valueRef.current[key] = result
-              return result
-            }
-            valueRef.current[key] = value
-            return value
-          })
-          onChangeRef?.current?.(
-            { key, value: valueRef.current[key], oldValue: valRef.current },
-            methods
-          )
+        methods[setKey] = (value: T[keyof T], trace?: unknown) => {
+          const oldValue = valueRef.current[key]
+          const newValue = typeof value === 'function' ? value(oldValue) : value
+          setVal(newValue)
+          valueRef.current[key] = newValue
+          onChangeRef?.current?.({ key, value: newValue, oldValue, trace }, methods)
         }
       }
 
