@@ -82,7 +82,7 @@ function createAtomicContext<T extends Record<string, unknown>>(
       return React.createElement(contexts[key].Provider, { value: val }, props.children)
     }
   )
-  AtomProviderWrapper.displayName = 'AtomicProviderInner'
+  AtomProviderWrapper.displayName = 'AtomicInnerProvider'
 
   function Provider(
     props: React.ProviderProps<T> & {
