@@ -180,11 +180,21 @@ function useAtomicContext<T extends Record<string, unknown>>(context: AtomicCont
 export { createAtomicContext, useAtomicContext }
 export type { AtomicContextMethodsType, ContextOnChangeType }
 
-export function createStore<T extends Record<string, unknown>>(initValue: T) {
+export function createStore<T extends Record<string, unknown>>(
+  initValue: T,
+  options?: {
+    onChange?: ContextOnChangeType<T>
+  }
+) {
   const keys = Object.keys(initValue) as (keyof T)[]
   const snapshot = { ...initValue }
   const methods: AtomicContextMethodsType<T> = Object.create({
-    get() {
+    get(warn = true) {
+      if (warn) {
+        console.warn(
+          `${name}: The "get()" method is only used for development to inspect the current store value.`
+        )
+      }
       return Object.freeze({ ...snapshot })
     },
   })
@@ -201,7 +211,9 @@ export function createStore<T extends Record<string, unknown>>(initValue: T) {
     const Key = `${(key as string)[0].toUpperCase()}${(key as string).slice(1)}`
     // @ts-expect-error good
     methods[`set${Key}`] = (val: T[keyof T]) => {
+      const oldValue = snapshot[key]
       snapshot[key] = val
+      options?.onChange?.({ key, oldValue, value: val }, methods)
       for (const cb of listeners) {
         cb()
       }
