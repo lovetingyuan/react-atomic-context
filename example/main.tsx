@@ -27,7 +27,7 @@ function App() {
           <a href="./?app=todo-list">todo-list</a>
         </li>
         <li>
-          <a href="./?app=perf">perf</a>
+          <a href="./?app=base2">base2</a>
         </li>
       </ul>
       <hr />

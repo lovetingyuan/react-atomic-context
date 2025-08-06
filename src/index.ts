@@ -11,7 +11,7 @@ import type {
   ContextsType,
   RootValueType,
 } from './types.ts'
-import React from 'react'
+import React, { useSyncExternalStore } from 'react'
 import { name } from '../package.json'
 
 const useContext = React.use || React.useContext
@@ -179,3 +179,40 @@ function useAtomicContext<T extends Record<string, unknown>>(context: AtomicCont
 
 export { createAtomicContext, useAtomicContext }
 export type { AtomicContextMethodsType, ContextOnChangeType }
+
+export function createStore<T extends Record<string, unknown>>(initValue: T) {
+  const keys = Object.keys(initValue) as (keyof T)[]
+  const snapshot = { ...initValue }
+  const methods: AtomicContextMethodsType<T> = Object.create({
+    get() {
+      return Object.freeze({ ...snapshot })
+    },
+  })
+  const store: AtomicContextValueType<T> = Object.create(methods)
+  for (const key of keys) {
+    const listeners = new Set<() => void>()
+    const getValue = () => snapshot[key]
+    const subscribe = (cb: () => void) => {
+      listeners.add(cb)
+      return () => {
+        listeners.delete(cb)
+      }
+    }
+    const Key = `${(key as string)[0].toUpperCase()}${(key as string).slice(1)}`
+    // @ts-expect-error good
+    methods[`set${Key}`] = (val: T[keyof T]) => {
+      snapshot[key] = val
+      for (const cb of listeners) {
+        cb()
+      }
+    }
+    // @ts-expect-error good
+    methods[`get${Key}`] = () => snapshot[key]
+    Object.defineProperty(store, key, {
+      get() {
+        return useSyncExternalStore(subscribe, getValue)
+      },
+    })
+  }
+  return () => store
+}
