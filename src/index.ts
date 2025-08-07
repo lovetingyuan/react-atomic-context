@@ -11,7 +11,7 @@ import type {
   ContextsType,
   RootValueType,
 } from './types.ts'
-import React, { useSyncExternalStore } from 'react'
+import React, { useDebugValue, useSyncExternalStore } from 'react'
 import { name } from '../package.json'
 
 const useContext = React.use || React.useContext
@@ -221,8 +221,10 @@ export function createStore<T extends Record<string, unknown>>(
     // @ts-expect-error good
     methods[`get${Key}`] = () => snapshot[key]
     Object.defineProperty(store, key, {
-      get() {
-        return useSyncExternalStore(subscribe, getValue)
+      get: function getStoreValue() {
+        const value = useSyncExternalStore(subscribe, getValue)
+        useDebugValue(value, val => ({ key, value: val }))
+        return value
       },
     })
   }
